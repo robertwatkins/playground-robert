@@ -1,0 +1,4 @@
+Notes:
+
+Brief discussion of 'callback' in javascript.
+http://recurial.com/programming/understanding-callback-functions-in-javascript/
