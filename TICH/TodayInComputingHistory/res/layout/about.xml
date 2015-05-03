@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+android:id="@+id/widget29"
+android:layout_width="fill_parent"
+android:layout_height="fill_parent"
+android:orientation="vertical"
+xmlns:android="http://schemas.android.com/apk/res/android"
+>
+<ScrollView
+android:id="@+id/widget51"
+android:layout_width="fill_parent"
+android:layout_height="fill_parent"
+>
+<TextView
+android:id="@+id/widget52"
+android:layout_width="316px"
+android:layout_height="fill_parent"
+android:text="This is why this was written"
+android:textSize="18sp"
+>
+</TextView>
+</ScrollView>
+</LinearLayout>

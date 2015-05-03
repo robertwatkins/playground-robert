@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+android:id="@+id/widget29"
+android:layout_width="fill_parent"
+android:layout_height="fill_parent"
+android:orientation="vertical"
+xmlns:android="http://schemas.android.com/apk/res/android"
+>
+<TextView
+android:id="@+id/widget63"
+android:layout_width="fill_parent"
+android:layout_height="wrap_content"
+android:text="January 1, 2010"
+android:gravity="right"
+>
+</TextView>
+<TextView
+android:id="@+id/widget33"
+android:layout_width="fill_parent"
+android:layout_height="wrap_content"
+android:text="ARPANET starts to talk like the Internet"
+android:textSize="28sp"
+android:textStyle="bold"
+android:gravity="center"
+>
+</TextView>
+<ScrollView
+android:id="@+id/widget51"
+android:layout_width="fill_parent"
+android:layout_height="375px"
+>
+<TextView
+android:id="@+id/widget52"
+android:layout_width="316px"
+android:layout_height="fill_parent"
+android:text="The ARPANET will become the internet, but on this day, it begins to use TCP/IP (aka the Internet Protocol). Effectively preparing the fifteen year old network to communicate like the Internet does to this day."
+android:textSize="18sp"
+>
+</TextView>
+</ScrollView>
+</LinearLayout>

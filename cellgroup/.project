@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>cellgroup</name>
+	<comment></comment>
+	<projects>
+	</projects>
+	<buildSpec>
+	</buildSpec>
+	<natures>
+	</natures>
+	<linkedResources>
+		<link>
+			<name>my_db.erl</name>
+			<type>1</type>
+			<location>/Users/rwatkins/Documents/workspace/cellgroup/my_db.erl</location>
+		</link>
+	</linkedResources>
+</projectDescription>

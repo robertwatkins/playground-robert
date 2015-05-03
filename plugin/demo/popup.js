@@ -90,9 +90,11 @@ function getImageUrl(searchTerm, callback, errorCallback) {
 
 function renderStatus(statusText) {
   document.getElementById('status').textContent = statusText;
+  console.log('start loading data');
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+	console.log('start loading data');
   getCurrentTabUrl(function(url) {
     // Put the image URL in Google search.
     renderStatus('Performing Google Image search for ' + url);

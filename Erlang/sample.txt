@@ -1,0 +1,37 @@
+
+
+Let's take a test-driven development approach and see how this turns out.
+
+Forgetting the implementation, is this what we want?
+
+>tissue:init().                                              %%perform any initialization
+ok
+>tissue:split(Cell1).                                   %%Cell 1 splits, the output describes the new cell
+Cell2
+>tissue:split(Cell1).                                   %%Cell 1 splits again
+Cell3
+>tissue:split(Cell1).                                   %%at some point, we can't split any more
+{error, unable}
+>tissue:turn_cancerous(Cell1).              %%a cell can 'spontaneously' become cancerous
+ok
+>tissue:turn_cancerous(Cell1).              %%a cell may be re-triggered to be cancerous
+ok
+>tissue:turn_cancerous(Cell1,Cell2).  %%Cell1 can cause Cell2 to be cancerous
+ok
+>tissue:split(Cell2).                                  %% Cell2 can split to create another cancer cell
+Cell4
+>tissue:map();
+
+blank = no cell
+x = cancer
+0 = healthy
+------------------------------
+|                             |
+|                             |
+|              x              |
+|            xx0              |
+|                             |
+|                             | 
+|                             |
+|                             |
+-------------------------------
