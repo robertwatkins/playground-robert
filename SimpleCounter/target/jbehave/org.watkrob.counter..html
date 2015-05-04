@@ -1,0 +1,31 @@
+<style>
+div.step_successful{color:#008B00;font-weight:bold;}
+div.step_failed {color:red;font-weight:bold;}
+div.step_notPerformed {color:gold;font-weight:bold;}
+</style>
+<div class="story">
+<h1></h1>
+<div class="path">org/watkrob/counter.story</div>
+<div class="narrative"><h2>Narrative:</h2>
+<div class="element inOrderTo"><span class="keyword inOrderTo">In order to</span> track points for a game</div>
+<div class="element asA"><span class="keyword asA">As a</span> game player</div>
+<div class="element iWantTo"><span class="keyword iWantTo">I want to</span> be able to increment/decrement/set a counter.</div>
+</div>
+<div class="scenario">
+<h2>Scenario: Initialize the counter</h2>
+<div class="step_successful">Given I have just initialized the counter</div>
+<div class="step_successful">Then the value is <span class="step parameter">0</span></div>
+</div>
+<div class="scenario">
+<h2>Scenario: Using the 'add1' function when the counter is at the largest integer value has no effect on the counter</h2>
+<div class="step_failed">Given I have a counter with a value of Integer.MAX_VALUE <span class="keyword failed">(FAILED)</span><br/><span class="message failed">org.jbehave.core.steps.ParameterConverters$ParameterConvertionFailed: Integer.MAX_VALUE</span></div>
+<div class="step_notPerformed">When I use the 'add1' function <span class="keyword notPerformed">(NOT PERFORMED)</span></div>
+<div class="step_notPerformed">Then the value is Integer.MAX_VALUE <span class="keyword notPerformed">(NOT PERFORMED)</span></div>
+</div>
+<div class="scenario">
+<h2>Scenario: Using the 'subtract1' function when the counter is 0 has no effect on the counter</h2>
+<div class="step_successful">Given I have a counter with a value of <span class="step parameter">0</span></div>
+<div class="step_successful">When I use the 'subtract1' function</div>
+<div class="step_successful">Then the value is <span class="step parameter">0</span></div>
+</div>
+</div>
