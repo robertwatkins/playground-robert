@@ -17,6 +17,9 @@ The beginnings of a 'secure note' plugin. The initial version is for Chrome, tho
 **reference**
 Using a tool to build a Rest API in node.js for a future project.
 
+**SimpleCounter**
+This has two purposes. (1) Provide a simple BDD (Behavior Driven Development) sample using JBehave and (2) Provide as a base for providing applicants a method of sending in a simple work sample where they are asked to fix an issue with this sample and submit an improvement.
+
 **TICH**
 [Today in Computing History](https://sites.google.com/site/todayincomputinghistory/) is a project that was inpsired by some of my writings on the history of computing. This folder contains mutliple projects for varvariations on the idea of having an electronic 'day at a time' calendar.
 
