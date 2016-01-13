@@ -23,3 +23,5 @@ This has two purposes. (1) Provide a simple BDD (Behavior Driven Development) sa
 **TICH**
 [Today in Computing History](https://sites.google.com/site/todayincomputinghistory/) is a project that was inpsired by some of my writings on the history of computing. This folder contains mutliple projects for varvariations on the idea of having an electronic 'day at a time' calendar.
 
+**Python**
+Scratchpad folder for sample code to be used in other projects. Mostly under construction.
