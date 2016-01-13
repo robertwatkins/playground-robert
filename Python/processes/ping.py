@@ -9,17 +9,36 @@
 #pip install gevent
 
 import sys
+import traceback
+import urllib
+import urllib2
 from gevent.pywsgi import WSGIServer, WSGIHandler
 from gevent import socket
 
+def request_error(start_response):
+    # Send error to atm - must provide start_response
+    start_response('500', [])
+    return ['']
+    
 def handle_transaction(env, start_response):
     try:
-        result = env['wsgi.input'].read()
-        print(result)
+        addr = env['wsgi.input'].read()
+        #print(addr)
+        #req = urllib2.Request(addr, data=urllib.urlencode('ping'))
+        req = urllib2.Request(addr, data='ping')
+        response = urllib2.urlopen(req)
+        reply = response.read()
+        #print(reply)
+        if (reply=='ping'):
+            print("Ping to "+addr+ " successful.")
+        else:
+            print("Ping to "+addr+ " failed.")
         sys.stdout.flush()
         start_response('200 OK', [])
-        return result
+        return reply
     except:
+        #traceback.print_exc()
+        print("Ping to "+addr+ " failed.")
         return request_error(start_response)
         
 class ErrorCapturingWSGIHandler(WSGIHandler):
@@ -28,7 +47,7 @@ class ErrorCapturingWSGIHandler(WSGIHandler):
         try:
             result = WSGIHandler.read_requestline(self)
         except:
-            protocol_error()
+            #traceback.print_exc()
             raise # re-raise error, to not change WSGIHandler functionality
         return result
 
@@ -37,7 +56,7 @@ class ErrorCapturingWSGIServer(WSGIServer):
     
 def start_server():
     server = ErrorCapturingWSGIServer(
-        ('', 3000), handle_transaction, log=None)
+        ('', 4000), handle_transaction, log=None)
 
     server.serve_forever()
 
@@ -46,6 +65,7 @@ def main():
         print("Ready...")
         start_server()
     except:
+        traceback.print_exc()
         print("Exiting...")
         sys.exit(255)
 

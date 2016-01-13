@@ -12,6 +12,11 @@ import sys
 from gevent.pywsgi import WSGIServer, WSGIHandler
 from gevent import socket
 
+def request_error(start_response):
+    # Send error to atm - must provide start_response
+    start_response('500', [])
+    return ['']
+    
 def handle_transaction(env, start_response):
     try:
         result = env['wsgi.input'].read()
