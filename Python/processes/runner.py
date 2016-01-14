@@ -1,25 +1,28 @@
-from __future__ import print_function
-import traceback
-import random
-import socket
-import argparse
-import threading
-import signal
-import json
-import requests
-import sys
-import time
-import json
-import base64
-import os
-import shutil
 import subprocess
-import tempfile
-from Queue import Queue
-from contextlib import contextmanager
-from multiprocessing import Process, Queue
-from Queue import Empty
-from gevent.pywsgi import WSGIServer, WSGIHandler
-from gevent import socket
-from datetime import datetime
-from threading import Lock
+import urllib
+import urllib2
+
+addr = "http://127.0.0.1:4000"
+
+pEcho = subprocess.Popen('echo.py', 
+    shell=True,
+    stdin=subprocess.PIPE,
+    stdout=subprocess.PIPE,
+    )
+    
+pPing = subprocess.Popen('ping.py', 
+    shell=True,
+    stdin=subprocess.PIPE,
+    stdout=subprocess.PIPE,
+    )
+
+for i in range(10):
+    msg = "http://127.0.0.1:3000"
+    print("Sending: "+msg)
+    req = urllib2.Request(addr, data=msg)
+    response = urllib2.urlopen(req)
+    echoOutput = pEcho.stdout.readline()
+    pingOutput = pPing.stdout.readline()
+    print "Echo: " + echoOutput.rstrip() + " - Ping: " + pingOutput.rstrip()
+
+
