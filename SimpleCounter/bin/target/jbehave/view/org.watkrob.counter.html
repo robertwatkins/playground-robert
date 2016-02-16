@@ -1,0 +1,70 @@
+<html>
+<head>
+<title>org.watkrob.counter</title>
+<style type="text/css" media="all">
+@import url( "./style/jbehave-core.css" );
+</style>
+</head>
+<body>
+<div class="story">
+<h1></h1>
+<div class="path">org/watkrob/counter.story</div>
+<div class="narrative"><h2>Narrative:</h2>
+<div class="element inOrderTo"><span class="keyword inOrderTo">In order to</span> track points for a game</div>
+<div class="element asA"><span class="keyword asA">As a</span> game player</div>
+<div class="element iWantTo"><span class="keyword iWantTo">I want to</span> be able to increment/decrement/set a counter.</div>
+</div>
+<div class="scenario">
+<h2>Scenario: Initialize the counter</h2>
+<div class="step successful">Given I have just initialized the counter</div>
+<div class="step successful">Then the value is <span class="step parameter">0</span></div>
+</div>
+<div class="scenario">
+<h2>Scenario: Using the 'add1' function raises the counter by 1</h2>
+<div class="step successful">Given I have a counter with a value of <span class="step parameter">3</span></div>
+<div class="step successful">When I use the 'add1' function</div>
+<div class="step successful">Then the value is <span class="step parameter">4</span></div>
+</div>
+<div class="scenario">
+<h2>Scenario: Using the 'subtract1' function reduces the counter by 1</h2>
+<div class="step successful">Given I have a counter with a value of <span class="step parameter">10</span></div>
+<div class="step successful">When I use the 'subtract1' function</div>
+<div class="step successful">Then the value is <span class="step parameter">9</span></div>
+</div>
+<div class="scenario">
+<h2>Scenario: Using the 'add1' function when the counter is at the largest integer value has no effect on the counter</h2>
+<div class="step failed">Given I have a counter with a value of Integer.MAX_VALUE <span class="keyword failed">(FAILED)</span><br/><span class="message failed">org.jbehave.core.steps.ParameterConverters$ParameterConvertionFailed: Integer.MAX_VALUE</span></div>
+<div class="step notPerformed">When I use the 'add1' function <span class="keyword notPerformed">(NOT PERFORMED)</span></div>
+<div class="step notPerformed">Then the value is Integer.MAX_VALUE <span class="keyword notPerformed">(NOT PERFORMED)</span></div>
+</div>
+<div class="scenario">
+<h2>Scenario: Using the 'subtract1' function when the counter is 0 has no effect on the counter</h2>
+<div class="step successful">Given I have a counter with a value of <span class="step parameter">0</span></div>
+<div class="step successful">When I use the 'subtract1' function</div>
+<div class="step successful">Then the value is <span class="step parameter">0</span></div>
+</div>
+</div>
+
+</body>
+<!--  SyntaxHighlighter resources:  should be included at end of body -->
+<link rel="stylesheet" type="text/css" href="./style/sh-3.0.83/shCore.css"/>
+<link rel="stylesheet" type="text/css" href="./style/sh-3.0.83/shThemeRDark.css"/>
+<script language="javascript" src="./js/sh-3.0.83/shCore.js"></script>
+<script language="javascript" src="./js/sh-3.0.83/shBrushBash.js"></script>
+<script language="javascript" src="./js/sh-3.0.83/shBrushCss.js"></script>
+<script language="javascript" src="./js/sh-3.0.83/shBrushDiff.js"></script>
+<script language="javascript" src="./js/sh-3.0.83/shBrushGroovy.js"></script>
+<script language="javascript" src="./js/sh-3.0.83/shBrushJava.js"></script>
+<script language="javascript" src="./js/sh-3.0.83/shBrushJScript.js"></script>
+<script language="javascript" src="./js/sh-3.0.83/shBrushPlain.js"></script>
+<script language="javascript" src="./js/sh-3.0.83/shBrushPython.js"></script>
+<script language="javascript" src="./js/sh-3.0.83/shBrushRuby.js"></script>
+<script language="javascript" src="./js/sh-3.0.83/shBrushScala.js"></script>
+<script language="javascript" src="./js/sh-3.0.83/shBrushXml.js"></script>
+<script language="javascript" src="./js/shBrushBdd.js"></script>
+<script type="text/javascript">
+    SyntaxHighlighter.defaults['gutter'] = false;
+    SyntaxHighlighter.defaults['toolbar'] = false;    
+    SyntaxHighlighter.all();
+</script>
+</html>
