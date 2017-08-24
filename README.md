@@ -20,6 +20,9 @@ Using a tool to build a Rest API in node.js for a future project.
 **SecureLogin**
 Demo implementation of secure login. Everything is in memory, no db. This is focused on getting the sequence of steps right using appropriate algorithms
 
+**Sikuli**
+Samples for running Sikuli on Linux with Firefox.
+
 **SimpleCounter**
 This has two purposes. (1) Provide a simple BDD (Behavior Driven Development) sample using JBehave and (2) Provide as a base for providing applicants a method of sending in a simple work sample where they are asked to fix an issue with this sample and submit an improvement.
 
