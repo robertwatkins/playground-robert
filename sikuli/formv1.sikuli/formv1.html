@@ -1,0 +1,91 @@
+
+<html>
+   <head>
+      <style type="text/css">
+         .sikuli-code {
+            font-size: 20px;
+            font-family: "Osaka-mono", Monospace;
+            line-height: 1.5em;
+            display:table-cell;
+            white-space: pre-wrap;       /* css-3 */
+            white-space: -moz-pre-wrap !important;  /* Mozilla, since 1999 */
+            white-space: -pre-wrap;      /* Opera 4-6 */
+            white-space: -o-pre-wrap;    /* Opera 7 */
+            word-wrap: break-word;       /* Internet Explorer 5.5+ */
+            width: 99%;   /* remove horizontal scroll-bar when viewing in IE7 */
+         }
+         .sikuli-code img {
+            vertical-align: middle;
+            margin: 2px;
+            border: 1px solid #ccc;
+            padding: 2px;
+            -moz-border-radius: 5px;
+            -webkit-border-radius: 5px;
+            -moz-box-shadow: 1px 1px 1px gray;
+            -webkit-box-shadow: 1px 1px 2px gray;
+         }
+         .kw {
+            color: blue;
+         }
+         .skw {
+            color: rgb(63, 127, 127);
+         }
+
+         .str {
+            color: rgb(128, 0, 0);
+         }
+
+         .dig {
+            color: rgb(128, 64, 0);
+         }
+
+         .cmt {
+            color: rgb(200, 0, 200);
+         }
+
+         h2 {
+            display: inline;
+            font-weight: normal;
+         }
+
+         .info {
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+            margin-bottom: 20px;
+            display: none;
+         }
+
+         a {
+            color: #9D2900;
+         }
+
+         body {
+            font-family: "Trebuchet MS", Arial, Sans-Serif;
+         }
+
+      </style>
+   </head>
+<body>
+<div class="info">
+<h2>formv1.sikuli</h2> <a href="formv1.zip">(Download this script)</a>
+</div>
+<pre class="sikuli-code">
+<span class="cmt">#https://docs.google.com/forms/d/e/1FAIpQLSfLB0U65q0xK92yFbd_pRKqVL6fhMX3Iw2IxNiJKgsoxDg9IQ/viewform?usp=sf_link</span>
+<span class="cmt">#view at 90%</span>
+<span class="cmt">#This fills out the form, or at least attempts to.</span>
+<span class="cmt">#When you run it you will see that it stops.</span>
+<span class="skw">type</span>(Pattern(<img src="1503023756705.png" />).targetOffset(-<span class="dig">93</span>,<span class="dig">20</span>), <span class="str">"01/01/2017"</span>)
+<span class="skw">type</span>(Pattern(<img src="1503023792830.png" />).targetOffset(-<span class="dig">69</span>,<span class="dig">21</span>), <span class="str">"70"</span>)
+<span class="skw">click</span>(Pattern(<img src="1503023876047.png" />).targetOffset(-<span class="dig">16</span>,-<span class="dig">6</span>))
+<span class="skw">type</span>(<img src="1503023919535.png" />, <span class="str">"1"</span>)
+<span class="skw">type</span>(<img src="1503023943275.png" />,<span class="str">"2"</span> )
+<span class="skw">type</span>(<img src="1503023970708.png" />, <span class="str">"3"</span>)
+<span class="skw">type</span>(<img src="1503023986808.png" />, <span class="str">"4"</span>)
+<span class="skw">type</span>(<img src="1503024016342.png" />, <span class="str">"5"</span>)
+<span class="skw">type</span>(<img src="1503024030884.png" />, <span class="str">"6"</span>)
+<span class="skw">type</span>(<img src="1503024043405.png" />, <span class="str">"7"</span>)
+<span class="skw">type</span>(<img src="1503024057669.png" />, <span class="str">"8"</span>)
+<span class="skw">click</span>(<img src="1503024073423.png" />)
+</pre>
+</body>
+</html>
