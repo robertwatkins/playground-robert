@@ -70,7 +70,8 @@
 <h2>letmegooglethatforyou.sikuli</h2> <a href="letmegooglethatforyou.zip">(Download this script)</a>
 </div>
 <pre class="sikuli-code">
-<span class="skw">click</span>(<img src="1503877602839.png" />)
+<span class="skw">click</span>(Pattern(<img src="1504061287913.png" />).similar(<span class="dig">0.95</span>))
+
 <span class="skw">wait</span>(Pattern(<img src="1503877845868.png" />).similar(<span class="dig">0.95</span>))
 <span class="skw">click</span>(Pattern(<img src="1503877845868.png" />).similar(<span class="dig">0.95</span>))
 <span class="skw">wait</span>(<img src="1503877104119.png" />)
@@ -79,7 +80,7 @@
 <span class="skw">wait</span>(<img src="1503877160410.png" />)
 logo = <span class="skw">find</span>(<img src="1503877160410.png" />)
 logo.highlight(<span class="dig">2</span>)
-<span class="skw">popup</span>(<span class="str">"Google is your friend"</span>)
+Do.<span class="skw">popup</span>(<span class="str">"Google is your friend"</span>,<span class="dig">3</span>,logo)
 search = <span class="skw">input</span>(<span class="str">"What do you want to know?"</span>,<span class="str">"Type your question here"</span>)
 
 <span class="skw">type</span>(<img src="1503877308405.png" />,search)
