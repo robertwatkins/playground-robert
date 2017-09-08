@@ -11,7 +11,7 @@ logo.highlight(2)
 Do.popup("Google is your friend",3,logo)
 search = input("What do you want to know?","Type your question here")
 
-type("1503877308405.png",search)
+type("1503877308405.png",search + "\r")
 wait("1503877367605.png")
 click("1503877367605.png")
 wait("1503877433623.png")
