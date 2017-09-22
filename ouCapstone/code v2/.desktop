@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=fib
+Type=Application
+Exec=/home/rwatkins/code/playground-robert/ouCapstone/code\ v2/fib
+Icon=/home/rwatkins/code/playground-robert/ouCapstone/icon.png
+Terminal=true
