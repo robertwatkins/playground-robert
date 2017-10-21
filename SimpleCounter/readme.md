@@ -1,7 +1,7 @@
-#Introduction
+# Introduction
 This is a simple example of using Behavior-Driven Development practices to write tests. 
 
-#Getting Set Up
+# Getting Set Up
 The only 3rd-party library is 'jbehave' which provides the toolset for implementing the test. If you have a Java IDE and 
 maven set up, you are ready to go. If not, I would like to suggest using 
  - The latest version of the [Java JDK](https://java.com/en/download/)
@@ -10,5 +10,5 @@ maven set up, you are ready to go. If not, I would like to suggest using
  
  Once you have your tools in place, download or clone [this project](https://github.com/robertwatkins/playground-robert) 
  
- #Running the code
+ # Running the code
   - Run the 'SimpleCounterRunner.java' file.
