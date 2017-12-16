@@ -1,4 +1,5 @@
 
+import org.gephi.graph.api.*;
 import org.gephi.io.exporter.api.ExportController;
 import org.gephi.io.importer.api.Container;
 import org.gephi.io.importer.api.EdgeDirectionDefault;
@@ -15,17 +16,42 @@ import java.io.*;
 public class WorkingSample {
 
     public static void main(String[] args)
-        {
-            System.out.println(System.getProperty("user.dir"));
-            File graphmlFile = new File("src/main/resources/xsmall.graphml");
-            System.out.println("File size:"+graphmlFile.length());
-            Workspace workspace = initializeGephiWorkspace();
-            workspace = importGraphML(graphmlFile,workspace);
+    {
+        System.out.println(System.getProperty("user.dir"));
+        File graphmlFile = new File("src/main/resources/Sample.graphml");
+        System.out.println("File size:"+graphmlFile.length());
+        Workspace workspace = initializeGephiWorkspace();
+        workspace = importGraphML(graphmlFile,workspace);
+        processGraph(workspace);
+        String outputFilename="graph.png";
+        exportGraphMLToFile(outputFilename);
 
-            String outputFilename="graph.png";
-            exportGraphMLToFile(outputFilename, workspace);
+    }
+
+    private static void processGraph(Workspace workspace){
+        //Get a graph model - it exists because we have a workspace
+        GraphModel graphModel = Lookup.getDefault().lookup(GraphController.class).getGraphModel(workspace);
+        DirectedGraph directedGraph = graphModel.getDirectedGraph();
+        for (Edge edge:directedGraph.getEdges()) {
+
+            System.out.println("Edge  label = " + edge.getLabel());
+            System.out.println("      id    = " + edge.getId());
 
         }
+
+        for (Node node:directedGraph.getNodes()){
+
+            System.out.println("Node  label       = "+ node.getLabel());
+            System.out.print("      attributes  = " );
+            for (Column column:node.getAttributeColumns()){
+                System.out.print("("+column.getTitle()+", "+node.getAttribute(column)+") ");
+            }
+            System.out.println();
+            System.out.println("      id          = "+ node.getId());
+
+        }
+
+    }
 
     private static Workspace initializeGephiWorkspace() {
         //Init a project - and therefore a workspace
@@ -36,7 +62,7 @@ public class WorkingSample {
         return pc.getCurrentWorkspace();
     }
 
-    private static void exportGraphMLToFile(String outputFilename, Workspace workspace) {
+    private static void exportGraphMLToFile(String outputFilename) {
         //http://bits.netbeans.org/7.4/javadoc/org-openide-util-lookup/org/openide/util/lookup/doc-files/index.html
         ExportController ec = Lookup.getDefault().lookup(ExportController.class);
         try {
