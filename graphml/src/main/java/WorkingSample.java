@@ -16,15 +16,36 @@ public class WorkingSample {
 
     public static void main(String[] args)
         {
-        System.out.println("Base Directory:"+System.getProperty("user.dir"));
         File graphmlFile = new File("src/main/resources/Sample.graphml");
         System.out.println("File size (if 0, then something isn't right):"+graphmlFile.length());
+        Workspace workspace = initializeGephiWorkspace();
+        workspace = importGraphML(graphmlFile,workspace);
+        String outputFilename="graph.pdf";
+        exportGraphMLToFile(outputFilename, workspace);
+
+        }
+
+    private static Workspace initializeGephiWorkspace() {
         //Init a project - and therefore a workspace
         ProjectController pc = Lookup.getDefault().lookup(ProjectController.class);
         pc.newProject();
         pc.newWorkspace(pc.getCurrentProject());
         Workspace workspace = pc.getCurrentWorkspace();
 
+        return workspace;
+    }
+
+    private static void exportGraphMLToFile(String outputFilename, Workspace workspace) {
+        //ExportController ec = Lookup.getDefault().lookup(ExportController.class);
+        ExportController ec = workspace.getLookup().lookup(ExportController.class);
+        try {
+            ec.exportFile(new File(outputFilename));
+        } catch (Exception e){
+            System.out.println("yikes. "+e.getMessage());
+        }
+    }
+
+    private static Workspace importGraphML(File graphmlFile, Workspace workspace) {
         // get import controller
         ImportController importController = Lookup.getDefault().lookup(ImportController.class);
         FileImporter fileImporter = importController.getFileImporter(".graphml");
@@ -43,14 +64,6 @@ public class WorkingSample {
             System.out.println("yikes. "+e.getMessage());
         }
         //Append imported data to GraphAPI
-
-
-        //Export graph to PDF
-        ExportController ec = Lookup.getDefault().lookup(ExportController.class);
-        try {
-            ec.exportFile(new File("graph.pdf"));
-        } catch (Exception e){
-            System.out.println("yikes. "+e.getMessage());
-        }
+        return workspace;
     }
 }
