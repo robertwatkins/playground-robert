@@ -16,12 +16,14 @@ public class WorkingSample {
 
     public static void main(String[] args)
         {
-        File graphmlFile = new File("src/main/resources/Sample.graphml");
-        System.out.println("File size (if 0, then something isn't right):"+graphmlFile.length());
-        Workspace workspace = initializeGephiWorkspace();
-        workspace = importGraphML(graphmlFile,workspace);
-        String outputFilename="graph.pdf";
-        exportGraphMLToFile(outputFilename, workspace);
+            System.out.println(System.getProperty("user.dir"));
+            File graphmlFile = new File("src/main/resources/xsmall.graphml");
+            System.out.println("File size:"+graphmlFile.length());
+            Workspace workspace = initializeGephiWorkspace();
+            workspace = importGraphML(graphmlFile,workspace);
+
+            String outputFilename="graph.png";
+            exportGraphMLToFile(outputFilename, workspace);
 
         }
 
@@ -30,18 +32,18 @@ public class WorkingSample {
         ProjectController pc = Lookup.getDefault().lookup(ProjectController.class);
         pc.newProject();
         pc.newWorkspace(pc.getCurrentProject());
-        Workspace workspace = pc.getCurrentWorkspace();
 
-        return workspace;
+        return pc.getCurrentWorkspace();
     }
 
     private static void exportGraphMLToFile(String outputFilename, Workspace workspace) {
-        //ExportController ec = Lookup.getDefault().lookup(ExportController.class);
-        ExportController ec = workspace.getLookup().lookup(ExportController.class);
+        //http://bits.netbeans.org/7.4/javadoc/org-openide-util-lookup/org/openide/util/lookup/doc-files/index.html
+        ExportController ec = Lookup.getDefault().lookup(ExportController.class);
         try {
             ec.exportFile(new File(outputFilename));
+            System.out.println("Write file: "+outputFilename);
         } catch (Exception e){
-            System.out.println("yikes. "+e.getMessage());
+            System.out.println("yikes. Error writing image. "+e.getMessage());
         }
     }
 
@@ -52,16 +54,11 @@ public class WorkingSample {
         //Import file
         try {
             Container container = importController.importFile(graphmlFile,fileImporter);
-
-            System.out.println("Container is null? "+(null==container)+ " : " );
-            System.out.println("source="+container.getSource());
-            System.out.println("verify()="+container.verify() );
             System.out.println("Read graphml file");
-            container.getLoader().setEdgeDefault(EdgeDirectionDefault.UNDIRECTED);
-            System.out.println("Container is null?"+(null==container));
+            container.getLoader().setEdgeDefault(EdgeDirectionDefault.DIRECTED);
             importController.process(container, new DefaultProcessor(), workspace);
         } catch (Exception e){
-            System.out.println("yikes. "+e.getMessage());
+            System.out.println("yikes. Error Importing file. "+e.getMessage());
         }
         //Append imported data to GraphAPI
         return workspace;
