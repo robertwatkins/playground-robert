@@ -1,10 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <graphml xmlns="http://graphml.graphdrawing.org/xmlns">
     <graph id="G" edgedefault="undirected">
-        <node id="n0"/>
-        <node id="n1"/>
-        <node id="n2"/>
-        <edge source="n0" target="n2"/>
+        <node id="n0">
+		<graph id="H" edgedefault="undirected">
+			<node id="n1"/>
+			<node id="n2"/>
+		</graph>
+	</node>
+	<node id="n3">
+		<graph id="I" edgedefault="undirected">
+			<node id="n4"/>
+		</graph>
+	</node>
+        <edge source="n4" target="n2"/>
         <edge source="n1" target="n2"/>
     </graph>
 </graphml>
