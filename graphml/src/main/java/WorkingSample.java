@@ -47,9 +47,7 @@ public class WorkingSample {
         GraphModel graphModel = Lookup.getDefault().lookup(GraphController.class).getGraphModel(workspace);
         DirectedGraph directedGraph = graphModel.getDirectedGraph();
         setLabelToDescription(directedGraph);
-
         setNodeColors(directedGraph);
-
 
     }
 
@@ -171,7 +169,7 @@ public class WorkingSample {
         YifanHuLayout layout = new YifanHuLayout(null, new StepDisplacement(1f));
         layout.setGraphModel(graphModel);
         layout.resetPropertiesValues();
-        layout.setOptimalDistance(200f);
+        layout.setOptimalDistance(400f);
 
         layout.initAlgo();
         for (int i = 0; i < 100 && layout.canAlgo(); i++) {
@@ -196,8 +194,8 @@ public class WorkingSample {
         model.getProperties().putValue(PreviewProperty.EDGE_CURVED, Boolean.TRUE);
         model.getProperties().putValue(PreviewProperty.EDGE_COLOR, new EdgeColor(Color.GRAY));
         model.getProperties().putValue(PreviewProperty.EDGE_THICKNESS, new Float(0.1f));
-        model.getProperties().putValue(PreviewProperty.EDGE_LABEL_FONT, new Font("Arial", Font.PLAIN,32));
-        model.getProperties().putValue(PreviewProperty.EDGE_LABEL_OUTLINE_SIZE,50);
+        model.getProperties().putValue(PreviewProperty.EDGE_LABEL_FONT, new Font("Arial", Font.PLAIN,22));
+        //model.getProperties().putValue(PreviewProperty.EDGE_LABEL_OUTLINE_SIZE,50);
         model.getProperties().putValue(PreviewProperty.DIRECTED,Boolean.TRUE);
         model.getProperties().putValue(PreviewProperty.CATEGORY_EDGE_ARROWS,Boolean.TRUE);
         model.getProperties().putValue(PreviewProperty.ARROW_SIZE, 10);
