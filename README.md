@@ -10,6 +10,9 @@ Basic notes on learning Erlang.
 **genetic**
 An experiment in writing a genetic algorithm to [simulate the 'sine' function using a polynomial equation](https://plus.google.com/u/0/102247002918593029402/posts/DmRRRkDeGrg?pid=6007141866236681474&oid=102247002918593029402). It was written in TCL and used ImageMagik to create an animated gif of the results.
 
+**graphml**
+Sample code for importing, manipulating and exporting graphml
+
 **ouCapstone**
 Sample code and documents for presentations given to the OU CS Capsone class
 
