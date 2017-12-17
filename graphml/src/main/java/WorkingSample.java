@@ -11,6 +11,7 @@ import org.gephi.layout.plugin.force.yifanHu.YifanHuLayout;
 import org.gephi.preview.api.PreviewController;
 import org.gephi.preview.api.PreviewModel;
 import org.gephi.preview.api.PreviewProperty;
+import org.gephi.preview.types.DependantColor;
 import org.gephi.preview.types.EdgeColor;
 import org.gephi.project.api.ProjectController;
 import org.gephi.project.api.Workspace;
@@ -35,7 +36,7 @@ public class WorkingSample {
         GraphModel graphModel = Lookup.getDefault().lookup(GraphController.class).getGraphModel(workspace);
         DirectedGraph directedGraph = graphModel.getDirectedGraph();
         //listEdges(directedGraph);
-        listNodes(directedGraph);
+        //listNodes(directedGraph);
         String outputFilename="graph.pdf";
         exportGraphMLToFile(outputFilename);
 
@@ -47,6 +48,52 @@ public class WorkingSample {
         DirectedGraph directedGraph = graphModel.getDirectedGraph();
         setLabelToDescription(directedGraph);
 
+        setNodeColors(directedGraph);
+
+
+    }
+
+    private static void setNodeColors(DirectedGraph directedGraph) {
+        for (Node node:directedGraph.getNodes()){
+            //fix labels after import
+            for (Column column:node.getAttributeColumns()){
+                //System.out.println(column.getTitle()+":"+node.getAttribute(column));
+                if (column.getTitle().equals("System") && node.getAttribute(column)!=null) {
+                    String systemName = (String)node.getAttribute(column);
+                    Color color;
+                    switch (systemName){
+                        case "none" :
+                            color = Color.LIGHT_GRAY;
+                            break;
+
+                        case "Warehouse":
+                            color = Color.CYAN; //Color.decode("0x000033");
+                            break;
+
+                        case "Inventory":
+                            color = Color.MAGENTA; //Color.decode("0x003333");
+                            break;
+
+                        case "Portal":
+                            color = Color.GREEN; //Color.decode("0x330033");
+                            break;
+
+                        case "Receiving":
+                            color = Color.ORANGE; //Color.decode("0x330000");
+                            break;
+
+                        case "Accounting":
+                            color = Color.BLUE; //Color.decode("0x333300");
+                            break;
+
+                        default:
+                            color = Color.LIGHT_GRAY; //Color.decode("0x333333");
+                    }
+                    System.out.println("Setting "+node.getLabel()+ " to color '"+color+"'");
+                    node.setColor(color);
+                }
+            }
+        }
     }
 
     private static void setLabelToDescription(DirectedGraph directedGraph) {
@@ -61,6 +108,18 @@ public class WorkingSample {
                 }
             }
         }
+
+        //edges have their descriptions in custom field called 'd13'
+        for (Edge edge:directedGraph.getEdges()){
+            //fix labels after import
+            for (Column column:edge.getAttributeColumns()){
+                if (column.getTitle().equals("d13")) {
+                    String newLabel = (String)edge.getAttribute(column);
+                    edge.setLabel(newLabel);
+                }
+            }
+        }
+
     }
 
     private static void listNodes(DirectedGraph directedGraph) {
@@ -89,6 +148,10 @@ public class WorkingSample {
 
             System.out.println("Edge  label = " + edge.getLabel());
             System.out.println("      id    = " + edge.getId());
+            for (Column column:edge.getAttributeColumns()){
+                System.out.print("("+column.getTitle()+", "+edge.getAttribute(column)+") ");
+            }
+            System.out.println();
 
         }
     }
@@ -124,10 +187,20 @@ public class WorkingSample {
         //Preview
         PreviewModel model = Lookup.getDefault().lookup(PreviewController.class).getModel();
         model.getProperties().putValue(PreviewProperty.SHOW_NODE_LABELS, Boolean.TRUE);
+        model.getProperties().putValue(PreviewProperty.NODE_OPACITY, 100);
+        model.getProperties().putValue(PreviewProperty.NODE_LABEL_FONT, model.getProperties().getFontValue(PreviewProperty.NODE_LABEL_FONT).deriveFont(8));
+        model.getProperties().putValue(PreviewProperty.NODE_BORDER_WIDTH,50);
+        model.getProperties().putValue(PreviewProperty.NODE_BORDER_COLOR, new DependantColor(Color.LIGHT_GRAY));
+
+        model.getProperties().putValue(PreviewProperty.SHOW_EDGE_LABELS, Boolean.TRUE);
+        model.getProperties().putValue(PreviewProperty.EDGE_CURVED, Boolean.TRUE);
         model.getProperties().putValue(PreviewProperty.EDGE_COLOR, new EdgeColor(Color.GRAY));
         model.getProperties().putValue(PreviewProperty.EDGE_THICKNESS, new Float(0.1f));
-        model.getProperties().putValue(PreviewProperty.NODE_LABEL_FONT, model.getProperties().getFontValue(PreviewProperty.NODE_LABEL_FONT).deriveFont(8));
-
+        model.getProperties().putValue(PreviewProperty.EDGE_LABEL_FONT, new Font("Arial", Font.PLAIN,32));
+        model.getProperties().putValue(PreviewProperty.EDGE_LABEL_OUTLINE_SIZE,50);
+        model.getProperties().putValue(PreviewProperty.DIRECTED,Boolean.TRUE);
+        model.getProperties().putValue(PreviewProperty.CATEGORY_EDGE_ARROWS,Boolean.TRUE);
+        model.getProperties().putValue(PreviewProperty.ARROW_SIZE, 10);
 
         //http://bits.netbeans.org/7.4/javadoc/org-openide-util-lookup/org/openide/util/lookup/doc-files/index.html
         ExportController ec = Lookup.getDefault().lookup(ExportController.class);
