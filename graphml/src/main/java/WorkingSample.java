@@ -40,6 +40,9 @@ public class WorkingSample {
         String outputFilename="graph.pdf";
         exportGraphMLToFile(outputFilename);
 
+        outputFilename="graph.graphml";
+        exportGraphMLToFile(outputFilename);
+
     }
 
     private static void processGraph(Workspace workspace){
