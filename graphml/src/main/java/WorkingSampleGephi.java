@@ -1,4 +1,5 @@
 
+
 import org.gephi.graph.api.*;
 import org.gephi.io.exporter.api.ExportController;
 import org.gephi.io.importer.api.Container;
@@ -22,8 +23,11 @@ import java.awt.*;
 import java.io.*;
 
 
-public class WorkingSample {
+public class WorkingSampleGephi {
 
+    //======================================
+    //The gephi library is reasonably good. The biggest issue is that it doesn't support subgraph import from graphml
+    //======================================
     public static void main(String[] args)
     {
         System.out.println(System.getProperty("user.dir"));
@@ -35,8 +39,8 @@ public class WorkingSample {
 
         GraphModel graphModel = Lookup.getDefault().lookup(GraphController.class).getGraphModel(workspace);
         DirectedGraph directedGraph = graphModel.getDirectedGraph();
-        //listEdges(directedGraph);
-        //listNodes(directedGraph);
+        listEdges(directedGraph);
+        listNodes(directedGraph);
         String outputFilename="graph.pdf";
         exportGraphMLToFile(outputFilename);
 
@@ -50,11 +54,12 @@ public class WorkingSample {
         GraphModel graphModel = Lookup.getDefault().lookup(GraphController.class).getGraphModel(workspace);
         DirectedGraph directedGraph = graphModel.getDirectedGraph();
         setLabelToDescription(directedGraph);
-        setNodeColors(directedGraph);
+        setNodeColorsManually(directedGraph);
 
     }
 
-    private static void setNodeColors(DirectedGraph directedGraph) {
+
+    private static void setNodeColorsManually(DirectedGraph directedGraph) {
         for (Node node:directedGraph.getNodes()){
             //fix labels after import
             for (Column column:node.getAttributeColumns()){
@@ -102,6 +107,8 @@ public class WorkingSample {
         //can be fixed. This sets it to a desired value
         for (Node node:directedGraph.getNodes()){
             //fix labels after import
+            //Due to locking, you would need to use toArray() on Iterable to be able to
+            //modify the graph in a read loop. Just a note, not needed in this use.
             for (Column column:node.getAttributeColumns()){
                 if (column.getTitle().equals("description")) {
                     String newLabel = (String)node.getAttribute(column);
@@ -113,6 +120,8 @@ public class WorkingSample {
         //edges have their descriptions in custom field called 'd13'
         for (Edge edge:directedGraph.getEdges()){
             //fix labels after import
+            //Due to locking, you would need to use toArray() on Iterable to be able to
+            //modify the graph in a read loop. Just a note, not needed in this use.
             for (Column column:edge.getAttributeColumns()){
                 if (column.getTitle().equals("d13")) {
                     String newLabel = (String)edge.getAttribute(column);
@@ -126,6 +135,8 @@ public class WorkingSample {
     private static void listNodes(DirectedGraph directedGraph) {
         for (Node node:directedGraph.getNodes()){
             //fix labels after import
+            //Due to locking, you would need to use toArray() on Iterable to be able to
+            //modify the graph in a read loop. Just a note, not needed in this use.
             for (Column column:node.getAttributeColumns()){
                 if (column.getTitle().equals("description")) {
                     String newLabel = (String)node.getAttribute(column);
@@ -149,6 +160,8 @@ public class WorkingSample {
 
             System.out.println("Edge  label = " + edge.getLabel());
             System.out.println("      id    = " + edge.getId());
+            //Due to locking, you would need to use toArray() on Iterable to be able to
+            //modify the graph in a read loop. Just a note, not needed in this use.
             for (Column column:edge.getAttributeColumns()){
                 System.out.print("("+column.getTitle()+", "+edge.getAttribute(column)+") ");
             }
@@ -196,9 +209,8 @@ public class WorkingSample {
         model.getProperties().putValue(PreviewProperty.SHOW_EDGE_LABELS, Boolean.TRUE);
         model.getProperties().putValue(PreviewProperty.EDGE_CURVED, Boolean.TRUE);
         model.getProperties().putValue(PreviewProperty.EDGE_COLOR, new EdgeColor(Color.GRAY));
-        model.getProperties().putValue(PreviewProperty.EDGE_THICKNESS, new Float(0.1f));
+        model.getProperties().putValue(PreviewProperty.EDGE_THICKNESS, 0.1f);
         model.getProperties().putValue(PreviewProperty.EDGE_LABEL_FONT, new Font("Arial", Font.PLAIN,22));
-        //model.getProperties().putValue(PreviewProperty.EDGE_LABEL_OUTLINE_SIZE,50);
         model.getProperties().putValue(PreviewProperty.DIRECTED,Boolean.TRUE);
         model.getProperties().putValue(PreviewProperty.CATEGORY_EDGE_ARROWS,Boolean.TRUE);
         model.getProperties().putValue(PreviewProperty.ARROW_SIZE, 10);
