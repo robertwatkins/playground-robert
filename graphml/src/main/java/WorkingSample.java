@@ -6,10 +6,18 @@ import org.gephi.io.importer.api.EdgeDirectionDefault;
 import org.gephi.io.importer.api.ImportController;
 import org.gephi.io.importer.spi.FileImporter;
 import org.gephi.io.processor.plugin.DefaultProcessor;
+import org.gephi.layout.plugin.force.StepDisplacement;
+import org.gephi.layout.plugin.force.yifanHu.YifanHuLayout;
+import org.gephi.preview.api.PreviewController;
+import org.gephi.preview.api.PreviewModel;
+import org.gephi.preview.api.PreviewProperty;
+import org.gephi.preview.types.EdgeColor;
 import org.gephi.project.api.ProjectController;
 import org.gephi.project.api.Workspace;
+import org.gephi.statistics.plugin.GraphDistance;
 import org.openide.util.Lookup;
 
+import java.awt.*;
 import java.io.*;
 
 
@@ -28,7 +36,7 @@ public class WorkingSample {
         DirectedGraph directedGraph = graphModel.getDirectedGraph();
         //listEdges(directedGraph);
         listNodes(directedGraph);
-        String outputFilename="graph.png";
+        String outputFilename="graph.pdf";
         exportGraphMLToFile(outputFilename);
 
     }
@@ -95,6 +103,32 @@ public class WorkingSample {
     }
 
     private static void exportGraphMLToFile(String outputFilename) {
+        GraphModel graphModel = Lookup.getDefault().lookup(GraphController.class).getGraphModel();
+        //Run YifanHuLayout for 100 passes - The layout always takes the current visible view
+        YifanHuLayout layout = new YifanHuLayout(null, new StepDisplacement(1f));
+        layout.setGraphModel(graphModel);
+        layout.resetPropertiesValues();
+        layout.setOptimalDistance(200f);
+
+        layout.initAlgo();
+        for (int i = 0; i < 100 && layout.canAlgo(); i++) {
+            layout.goAlgo();
+        }
+        layout.endAlgo();
+
+        //Get Centrality
+        GraphDistance distance = new GraphDistance();
+        distance.setDirected(true);
+        distance.execute(graphModel);
+
+        //Preview
+        PreviewModel model = Lookup.getDefault().lookup(PreviewController.class).getModel();
+        model.getProperties().putValue(PreviewProperty.SHOW_NODE_LABELS, Boolean.TRUE);
+        model.getProperties().putValue(PreviewProperty.EDGE_COLOR, new EdgeColor(Color.GRAY));
+        model.getProperties().putValue(PreviewProperty.EDGE_THICKNESS, new Float(0.1f));
+        model.getProperties().putValue(PreviewProperty.NODE_LABEL_FONT, model.getProperties().getFontValue(PreviewProperty.NODE_LABEL_FONT).deriveFont(8));
+
+
         //http://bits.netbeans.org/7.4/javadoc/org-openide-util-lookup/org/openide/util/lookup/doc-files/index.html
         ExportController ec = Lookup.getDefault().lookup(ExportController.class);
         try {
