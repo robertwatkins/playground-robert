@@ -23,6 +23,11 @@ public class WorkingSample {
         Workspace workspace = initializeGephiWorkspace();
         workspace = importGraphML(graphmlFile,workspace);
         processGraph(workspace);
+
+        GraphModel graphModel = Lookup.getDefault().lookup(GraphController.class).getGraphModel(workspace);
+        DirectedGraph directedGraph = graphModel.getDirectedGraph();
+        //listEdges(directedGraph);
+        listNodes(directedGraph);
         String outputFilename="graph.png";
         exportGraphMLToFile(outputFilename);
 
@@ -32,14 +37,33 @@ public class WorkingSample {
         //Get a graph model - it exists because we have a workspace
         GraphModel graphModel = Lookup.getDefault().lookup(GraphController.class).getGraphModel(workspace);
         DirectedGraph directedGraph = graphModel.getDirectedGraph();
-        for (Edge edge:directedGraph.getEdges()) {
+        setLabelToDescription(directedGraph);
 
-            System.out.println("Edge  label = " + edge.getLabel());
-            System.out.println("      id    = " + edge.getId());
+    }
 
-        }
-
+    private static void setLabelToDescription(DirectedGraph directedGraph) {
+        //the graphml import uses the 'role' as the label by default (not sure why, maybe that
+        //can be fixed. This sets it to a desired value
         for (Node node:directedGraph.getNodes()){
+            //fix labels after import
+            for (Column column:node.getAttributeColumns()){
+                if (column.getTitle().equals("description")) {
+                    String newLabel = (String)node.getAttribute(column);
+                    node.setLabel(newLabel);
+                }
+            }
+        }
+    }
+
+    private static void listNodes(DirectedGraph directedGraph) {
+        for (Node node:directedGraph.getNodes()){
+            //fix labels after import
+            for (Column column:node.getAttributeColumns()){
+                if (column.getTitle().equals("description")) {
+                    String newLabel = (String)node.getAttribute(column);
+                    node.setLabel(newLabel);
+                }
+            }
 
             System.out.println("Node  label       = "+ node.getLabel());
             System.out.print("      attributes  = " );
@@ -50,7 +74,15 @@ public class WorkingSample {
             System.out.println("      id          = "+ node.getId());
 
         }
+    }
 
+    private static void listEdges(DirectedGraph directedGraph) {
+        for (Edge edge:directedGraph.getEdges()) {
+
+            System.out.println("Edge  label = " + edge.getLabel());
+            System.out.println("      id    = " + edge.getId());
+
+        }
     }
 
     private static Workspace initializeGephiWorkspace() {
