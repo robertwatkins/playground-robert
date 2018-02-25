@@ -1,3 +1,4 @@
+#https://brilliant.org/wiki/extended-euclidean-algorithm/
 def egcd(a, b):
     phi = a
     x,y, u,v = 0,1, 1,0
