@@ -19,12 +19,12 @@ def keypair(p,q,e):
     print "Public Key:n=", hex(p*q), "e=" ,e ," Private Key:", hex(egcd(phi,e))
 
 #keypair(5,11,7)
-#For PaperCoin, pick p,q primes less than 255 and pick e as 3,5 or 7
-keypair(163,61,7)
-keypair(223,29,5)
-keypair(103,31,7)
-keypair(191,149,3)
-keypair(127,67,5)
-keypair(101,83,7)
-keypair(73,31,7)
-keypair(59,97,7)
+#For PaperCoin, pick p,q primes less than 64 and pick e as 3
+keypair(23,29,3)
+keypair(23,53,3)
+keypair(29,5,3)
+keypair(59,53,3)
+keypair(17,47,3)
+keypair(41,59,3)
+keypair(23,41,3)
+keypair(3,59,3)
