@@ -16,6 +16,9 @@ Sample code for importing, manipulating and exporting graphml
 **ouCapstone**
 Sample code and documents for presentations given to the OU CS Capsone class
 
+**PaperCoin**
+scripts used to generate data for PaperCoin paper
+
 **plugin**
 The beginnings of a 'secure note' plugin. The initial version is for Chrome, though not functional at this point.
 
