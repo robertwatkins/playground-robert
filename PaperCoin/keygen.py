@@ -18,13 +18,9 @@ def keypair(p,q,e):
     phi = (p-1)*(q-1)
     print "Public Key:n=", hex(p*q), "e=" ,e ," Private Key:", hex(egcd(phi,e))
 
-#keypair(5,11,7)
-#For PaperCoin, pick p,q primes less than 64 and pick e as 3
-keypair(23,29,3)
-keypair(23,53,3)
-keypair(29,5,3)
-keypair(59,53,3)
-keypair(17,47,3)
-keypair(41,59,3)
-keypair(23,41,3)
-keypair(3,59,3)
+#For PaperCoin, pick p,q primes and pick e as 3
+keypair(2,5,3)
+keypair(2,11,3)
+keypair(2,13,3)
+keypair(2,17,3)
+keypair(3,5,3)
