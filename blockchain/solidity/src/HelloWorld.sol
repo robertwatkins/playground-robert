@@ -3,7 +3,7 @@ pragma solidity ^0.4.0;
 contract HelloWorld {
     address owner;
 
-    function HelloWorld() public{
+    constructor() public{
         owner = msg.sender;
     }
 
@@ -11,8 +11,9 @@ contract HelloWorld {
         if (msg.sender == owner) selfdestruct(owner);
     }
 
-    function hello() public constant returns (string) {
+    function hello() pure public returns (string) {
         return "Hello World!";
     }
 
 }
+
