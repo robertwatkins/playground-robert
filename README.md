@@ -1,6 +1,9 @@
 # playground-robert
 Code projects that seem important enough to keep
 
+**blockchain**
+Experiements in writing smart contracts using Solidity
+
 **cellgroup**
 This was some code used in for a submission to the a Functional Programming Conference. It was simulating a cell matrix in Erlang.
 
