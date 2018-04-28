@@ -126,7 +126,7 @@ contract tictactoe {
         bool validGame;
         bytes1 winner;
         (validGame, winner) = isValid(gameState);
-	    require(validGame,"Not a valid game state.");
+        require(validGame,"Not a valid game state.");
         return winner;
     }
 }
