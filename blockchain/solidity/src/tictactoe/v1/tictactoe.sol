@@ -125,8 +125,19 @@ contract tictactoe {
     function showWinner(bytes9 gameState) payable public returns (bytes1) {
         bool validGame;
         bytes1 winner;
+        bytes1 unplayed = 0x00;
+        bytes1 cat = 0xFF;
         (validGame, winner) = isValid(gameState);
         require(validGame,"Not a valid game state.");
+        
+        if (winner == unplayed){
+            bool isCatWinner = true; 
+            uint i;
+            for (i=0; i<9; i++){
+                isCatWinner = (isCatWinner && (gameState[i] != unplayed));
+            }
+            if (isCatWinner) {winner = cat;}
+        }
         return winner;
     }
 }
