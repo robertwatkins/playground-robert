@@ -14,8 +14,6 @@ contract tictactoe {
         if (msg.sender == owner) selfdestruct(owner);
     }
 
-    event gameStateStatus(bool status);
-
     /// @author Robert Watkins
     /// @dev We are simply counting the instances of each players mark to ensure there is no obvious cheating.
     /// @param gameState represents the current state of the game
@@ -109,12 +107,11 @@ contract tictactoe {
     /// @dev By convention we will use '0x00' for a space not played, '0x11' for 'X' and '0xAA' for 'O'.
     ///      Return a boolean indicating the game state is valid or not.
     /// @param gameState represents the current state of the game
-    function isValid(bytes9 gameState) private returns (bool, bytes1){
+    function isValid(bytes9 gameState) pure private returns (bool, bytes1){
         bool onlyOneWinner;
         bytes1 winner;
         (onlyOneWinner, winner) = hasOnlyOneWinner(gameState);
         bool validGame = validPlayersTakingTurns(gameState) && onlyOneWinner;
-        emit gameStateStatus(validGame);
         return (validGame,winner);
     }
 
@@ -122,7 +119,7 @@ contract tictactoe {
     /// @notice Return a message indicating if the game state is valid
     /// @dev By convention we will use '0x00' for a space not played, '0x11' for 'X' and '0xAA' for 'O', 'CAT' (0xFF)
     /// @param gameState represents the current state of the game
-    function showWinner(bytes9 gameState) payable public returns (bytes1) {
+    function showWinner(bytes9 gameState) pure public returns (bytes1) {
         bool validGame;
         bytes1 winner;
         bytes1 unplayed = 0x00;
