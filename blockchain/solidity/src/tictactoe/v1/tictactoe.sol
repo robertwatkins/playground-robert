@@ -16,7 +16,7 @@ contract tictactoe {
 
     event gameStateStatus(bool status);
 
-    function validPlayersTakingTurns(bytes9 gameState) private returns (bool){
+    function validPlayersTakingTurns(bytes9 gameState) pure private returns (bool){
       bool validPlayers = true;
       bytes1 currentSpaceValue;
       bytes1 eX = 0x11;
@@ -41,46 +41,65 @@ contract tictactoe {
       return (validPlayers && takingTurns);
     }
     
-    function hasOnlyOneWinner(bytes9 gameState)private returns (bool){
-        bool noMoreThanOneWinner = ((gameState[0] == gameState[1] && gameState[1] == gameState[2])
-               ^(gameState[0] == gameState[3] && gameState[3] == gameState[6])
-               ^(gameState[0] == gameState[4] && gameState[4] == gameState[8])
-               ^(gameState[1] == gameState[4] && gameState[4] == gameState[7])
-               ^(gameState[2] == gameState[4] && gameState[4] == gameState[6])
-               ^(gameState[2] == gameState[5] && gameState[5] == gameState[8])
-               ^(gameState[3] == gameState[4] && gameState[4] == gameState[5])
-               ^(gameState[6] == gameState[7] && gameState[7] == gameState[8]));
-        bool atLeastOneWinner = ((gameState[0] == gameState[1] && gameState[1] == gameState[2])
-               ||(gameState[0] == gameState[3] && gameState[3] == gameState[6])
-               ||(gameState[0] == gameState[4] && gameState[4] == gameState[8])
-               ||(gameState[1] == gameState[4] && gameState[4] == gameState[7])
-               ||(gameState[2] == gameState[4] && gameState[4] == gameState[6])
-               ||(gameState[2] == gameState[5] && gameState[5] == gameState[8])
-               ||(gameState[3] == gameState[4] && gameState[4] == gameState[5])
-               ||(gameState[6] == gameState[7] && gameState[7] == gameState[8]));
-        
-        return (noMoreThanOneWinner && atLeastOneWinner);
+    function countIfWinning (uint256 playerMoveAtLocation1, uint256 playerMoveAtLocation2, uint256 playerMoveAtLocation3, bytes9 gameState) pure private returns (int, bytes1) {
+        int count = 0;
+        bytes1 eX = 0x11;
+        bytes1 oH = 0xAA;
+        if ((gameState[playerMoveAtLocation1] == eX || gameState[playerMoveAtLocation1] == oH) 
+                &&(gameState[playerMoveAtLocation1] == gameState[playerMoveAtLocation2] 
+                && gameState[playerMoveAtLocation2] == gameState[playerMoveAtLocation3])){
+           count++;
+        }
+        return (count, gameState[playerMoveAtLocation1]);
+    }
+    
+    function hasOnlyOneWinner(bytes9 gameState) pure private returns (bool, bytes1){
+        bytes1 winner = 0x0;
+        int count;
+        int totalWinnerCount = 0;
+        (count, winner) = countIfWinning(0,1,2,gameState);
+        totalWinnerCount += count;
+        (count, winner) = countIfWinning(0,3,6,gameState);
+        totalWinnerCount += count;
+        (count, winner) = countIfWinning(0,4,8,gameState);
+        totalWinnerCount += count;
+        (count, winner) = countIfWinning(1,4,7,gameState);
+        totalWinnerCount += count;
+        (count, winner) = countIfWinning(2,4,6,gameState);
+        totalWinnerCount += count;
+        (count, winner) = countIfWinning(2,5,8,gameState);
+        totalWinnerCount += count;
+        (count, winner) = countIfWinning(3,4,5,gameState);
+        totalWinnerCount += count;
+        (count, winner) = countIfWinning(6,7,8,gameState);
+        totalWinnerCount += count;
+        return (totalWinnerCount<=1,winner);
     }
     
     /// @author Robert Watkins
-    /// @dev By convention we will use '0x00' for a space not played, '0x11' for 'X' and '0xAA' for '0'.
+    /// @dev By convention we will use '0x00' for a space not played, '0x11' for 'X' and '0xAA' for 'O'.
     ///      Return a boolean indicating the game state is valid or not.
     /// @param gameState represents the current state of the game
-    function isValid(bytes9 gameState) private returns (bool){
-      bool validGame = validPlayersTakingTurns(gameState) && hasOnlyOneWinner(gameState);
-      emit gameStateStatus(validGame);
-      return validGame;
+    function isValid(bytes9 gameState) private returns (bool, bytes1){
+        bool onlyOneWinner;
+        bytes1 winner;
+        (onlyOneWinner, winner) = hasOnlyOneWinner(gameState);
+        bool validGame = validPlayersTakingTurns(gameState) && onlyOneWinner;
+        emit gameStateStatus(validGame);
+        return (validGame,winner);
     }
 
     /// @author Robert Watkins
     /// @notice Return a message indicating if the game state is valid
     /// @dev By convention we will use '0x00' for a space not played, '0x11' for 'X' and '0xAA' for 'O', 'CAT' (0xFF)
     /// @param gameState represents the current state of the game
-    function showWinner(bytes9 gameState) payable public returns (bytes4) {
-	    require(isValid(gameState),"Not a valid game state.");
-        return 0x00000000;
+    function showWinner(bytes9 gameState) payable public returns (bytes1) {
+        bool validGame;
+        bytes1 winner;
+        (validGame, winner) = isValid(gameState);
+	    require(validGame,"Not a valid game state.");
+        return winner;
     }
-
 }
 
 
