@@ -55,23 +55,32 @@ contract tictactoe {
     
     function hasOnlyOneWinner(bytes9 gameState) pure private returns (bool, bytes1){
         bytes1 winner = 0x0;
+        bytes1 matchingValue;
         int count;
         int totalWinnerCount = 0;
-        (count, winner) = countIfWinning(0,1,2,gameState);
+        (count, matchingValue) = countIfWinning(0,1,2,gameState);
+        if (count > 0) {winner = matchingValue;}
         totalWinnerCount += count;
-        (count, winner) = countIfWinning(0,3,6,gameState);
+        (count, matchingValue) = countIfWinning(0,3,6,gameState);
+        if (count > 0) {winner = matchingValue;}
         totalWinnerCount += count;
-        (count, winner) = countIfWinning(0,4,8,gameState);
+        (count, matchingValue) = countIfWinning(0,4,8,gameState);
+        if (count > 0) {winner = matchingValue;}
         totalWinnerCount += count;
-        (count, winner) = countIfWinning(1,4,7,gameState);
+        (count, matchingValue) = countIfWinning(1,4,7,gameState);
+        if (count > 0) {winner = matchingValue;}
         totalWinnerCount += count;
-        (count, winner) = countIfWinning(2,4,6,gameState);
+        (count, matchingValue) = countIfWinning(2,4,6,gameState);
+        if (count > 0) {winner = matchingValue;}
         totalWinnerCount += count;
-        (count, winner) = countIfWinning(2,5,8,gameState);
+        (count, matchingValue) = countIfWinning(2,5,8,gameState);
+        if (count > 0) {winner = matchingValue;}
         totalWinnerCount += count;
-        (count, winner) = countIfWinning(3,4,5,gameState);
+        (count, matchingValue) = countIfWinning(3,4,5,gameState);
+        if (count > 0) {winner = matchingValue;}
         totalWinnerCount += count;
-        (count, winner) = countIfWinning(6,7,8,gameState);
+        (count, matchingValue) = countIfWinning(6,7,8,gameState);
+        if (count > 0) {winner = matchingValue;}
         totalWinnerCount += count;
         return (totalWinnerCount<=1,winner);
     }
@@ -101,5 +110,3 @@ contract tictactoe {
         return winner;
     }
 }
-
-
