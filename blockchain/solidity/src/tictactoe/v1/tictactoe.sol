@@ -16,73 +16,93 @@ contract tictactoe {
 
     event gameStateStatus(bool status);
 
+    /// @author Robert Watkins
+    /// @dev We are simply counting the instances of each players mark to ensure there is no obvious cheating.
+    /// @param gameState represents the current state of the game
     function validPlayersTakingTurns(bytes9 gameState) pure private returns (bool){
       bool validPlayers = true;
       bytes1 currentSpaceValue;
       bytes1 eX = 0x11;
       bytes1 oH = 0xAA;
-      bytes1 unused = 0x00;
+      bytes1 unplayed = 0x00;
       int eXCount = 0;
       int oHCount = 0;
       uint i;
       
-      //playing spaces should only have valid entries (X,O,unused)
+      //playing spaces should only have valid entries (X,O,unplayed)
       for (i=0; i<9; i++){
         currentSpaceValue = gameState[i];
         if (currentSpaceValue == eX) {eXCount++;}
         if (currentSpaceValue == oH) {oHCount++;}
-        validPlayers = (validPlayers && (currentSpaceValue == eX || currentSpaceValue == oH || currentSpaceValue == unused) );
+        validPlayers = (validPlayers && (currentSpaceValue == eX || currentSpaceValue == oH || currentSpaceValue == unplayed) );
       }
       
       //the difference in the number of moves for each player should not be off by more than 1
+      //and only the X player could have more moves.
       int diffInMoveCount = eXCount - oHCount;
-      bool takingTurns = (diffInMoveCount == 1 || diffInMoveCount == 0 || diffInMoveCount == -1);
+      bool takingTurns = (diffInMoveCount == 1 || diffInMoveCount == 0 );
       
       return (validPlayers && takingTurns);
     }
     
-    function countIfWinning (uint256 playerMoveAtLocation1, uint256 playerMoveAtLocation2, uint256 playerMoveAtLocation3, bytes9 gameState) pure private returns (int, bytes1) {
+    /// @author Robert Watkins
+    /// @dev we will send a count of '1' if the pattern of player moves match values in the game state.
+    ///      The matching value will default to 'unplayed' if the count is 0. Otherwise, the matching
+    ///      player mark will be returned.
+    /// @param gameState represents the current state of the game
+    function countIfMatching (uint256 playerMoveAtLocation1, uint256 playerMoveAtLocation2, uint256 playerMoveAtLocation3, bytes9 gameState) pure private returns (int, bytes1) {
         int count = 0;
         bytes1 eX = 0x11;
         bytes1 oH = 0xAA;
-        if ((gameState[playerMoveAtLocation1] == eX || gameState[playerMoveAtLocation1] == oH) 
-                &&(gameState[playerMoveAtLocation1] == gameState[playerMoveAtLocation2] 
-                && gameState[playerMoveAtLocation2] == gameState[playerMoveAtLocation3])){
-           count++;
+        bytes1 unplayed = 0x00;
+        bytes1 matchingValue = unplayed;
+        if (gameState[playerMoveAtLocation1] != unplayed) {
+            if ((gameState[playerMoveAtLocation1] == eX || gameState[playerMoveAtLocation1] == oH) 
+                    &&(gameState[playerMoveAtLocation1] == gameState[playerMoveAtLocation2] 
+                    && gameState[playerMoveAtLocation2] == gameState[playerMoveAtLocation3])){
+               count++;
+            }
+            matchingValue = gameState[playerMoveAtLocation1];
         }
-        return (count, gameState[playerMoveAtLocation1]);
+        return (count, matchingValue);
     }
     
+    /// @author Robert Watkins
+    /// @dev We will check for matching values (X,O,unplayed) for winning patters (first row, diagonal, etc.)
+    ///      and return how many winning patterns found and the player for the last winning pattern found.
+    ///      This implies that if there is exactly one winner, it is the last one found.
+    /// @param gameState represents the current state of the game
     function hasOnlyOneWinner(bytes9 gameState) pure private returns (bool, bytes1){
-        bytes1 winner = 0x0;
+        bytes1 unplayed = 0x00;
+        bytes1 lastFoundWinner = unplayed;
         bytes1 matchingValue;
         int count;
         int totalWinnerCount = 0;
-        (count, matchingValue) = countIfWinning(0,1,2,gameState);
-        if (count > 0) {winner = matchingValue;}
+        (count, matchingValue) = countIfMatching(0,1,2,gameState);
+        if (count > 0) {lastFoundWinner = matchingValue;}
         totalWinnerCount += count;
-        (count, matchingValue) = countIfWinning(0,3,6,gameState);
-        if (count > 0) {winner = matchingValue;}
+        (count, matchingValue) = countIfMatching(0,3,6,gameState);
+        if (count > 0) {lastFoundWinner = matchingValue;}
         totalWinnerCount += count;
-        (count, matchingValue) = countIfWinning(0,4,8,gameState);
-        if (count > 0) {winner = matchingValue;}
+        (count, matchingValue) = countIfMatching(0,4,8,gameState);
+        if (count > 0) {lastFoundWinner = matchingValue;}
         totalWinnerCount += count;
-        (count, matchingValue) = countIfWinning(1,4,7,gameState);
-        if (count > 0) {winner = matchingValue;}
+        (count, matchingValue) = countIfMatching(1,4,7,gameState);
+        if (count > 0) {lastFoundWinner = matchingValue;}
         totalWinnerCount += count;
-        (count, matchingValue) = countIfWinning(2,4,6,gameState);
-        if (count > 0) {winner = matchingValue;}
+        (count, matchingValue) = countIfMatching(2,4,6,gameState);
+        if (count > 0) {lastFoundWinner = matchingValue;}
         totalWinnerCount += count;
-        (count, matchingValue) = countIfWinning(2,5,8,gameState);
-        if (count > 0) {winner = matchingValue;}
+        (count, matchingValue) = countIfMatching(2,5,8,gameState);
+        if (count > 0) {lastFoundWinner = matchingValue;}
         totalWinnerCount += count;
-        (count, matchingValue) = countIfWinning(3,4,5,gameState);
-        if (count > 0) {winner = matchingValue;}
+        (count, matchingValue) = countIfMatching(3,4,5,gameState);
+        if (count > 0) {lastFoundWinner = matchingValue;}
         totalWinnerCount += count;
-        (count, matchingValue) = countIfWinning(6,7,8,gameState);
-        if (count > 0) {winner = matchingValue;}
+        (count, matchingValue) = countIfMatching(6,7,8,gameState);
+        if (count > 0) {lastFoundWinner = matchingValue;}
         totalWinnerCount += count;
-        return (totalWinnerCount<=1,winner);
+        return (totalWinnerCount<=1,lastFoundWinner);
     }
     
     /// @author Robert Watkins
@@ -110,3 +130,5 @@ contract tictactoe {
         return winner;
     }
 }
+
+
