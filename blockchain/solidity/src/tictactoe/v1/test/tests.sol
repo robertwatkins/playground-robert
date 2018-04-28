@@ -1,14 +1,17 @@
+pragma solidity ^0.4.0;
+
 import "truffle/Assert.sol";
 import "truffle/DeployedAddresses.sol";
 import "../contracts/tictactoe.sol";
 
-contract TestTicTacToe {
-  function testShowWinnerUsingDeployedContract() {
+contract tests {
+  function testShowWinnerUsingDeployedContract() public {
     tictactoe game = tictactoe(DeployedAddresses.tictactoe());
 
-    bytes1 expected = 0x00;
+    bytes9 gameState = 0x111100aaaaaa110000;
+    bytes1 expected = 0xaa;
 
-    Assert.equal(game.showWinner(0x00), expected, "No winner expected for new game.");
+    Assert.equal(game.showWinner(gameState), expected, "No winner expected for new game.");
   }
 }
 
