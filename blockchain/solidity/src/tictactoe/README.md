@@ -26,7 +26,7 @@ moves or the result of the 'showWinner' function as described above.
 Implement the following methods
 
 *function: showWinner*
- - param: game state 
+This version will read from the stored version of the game state.
  - return: one of 'X', 'O', 'NONE', 'CAT' 
  - require: the game state must be valid
 
@@ -35,6 +35,9 @@ Implement the following methods
  - param: location on board for the move
  - return: the winner of the game to this point
  - require: the move must be valid
+
+*function:; getGameState*
+ - return: current game state
 
 ## Version 2
 A player can start a game (where they play the 'O' player) or join someone that
