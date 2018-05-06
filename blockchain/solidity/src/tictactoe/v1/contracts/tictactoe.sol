@@ -54,13 +54,13 @@ contract tictactoe {
     /// 3 | 4 | 5 
     ///---+---+---
     /// 6 | 7 | 8
-    function makeMove(bytes1 playerMakingMove, uint256 moveLocation) payable public returns (bytes9){
+    function makeMove(bytes9 playerMakingMove, uint256 moveLocation) payable public returns (bytes9){
         require (isValidPlayer(playerMakingMove),"Invalid Player");
         require (isValidMoveLocation(moveLocation), "Invalid Move");
         nextPlayer = playerAfter(playerMakingMove);
         //create an empty game and add the players move in location, 
         //then use bitwise 'or' to modifiy the gamestate
-        bytes9 moveMask = playerMakingMove << (moveLocation * 8);
+        bytes9 moveMask = playerMakingMove >> (moveLocation * 8);
         gameState = gameState | moveMask;
         return showWinner();
     }
@@ -80,7 +80,7 @@ contract tictactoe {
     
     /// @author Robert Watkins
     /// @notice returns the player to play next, based on the current player
-    function playerAfter(bytes1 player) view private returns (bytes1) {
+    function playerAfter(bytes9 player) view private returns (bytes1) {
         require(isValidPlayer(player));
         if (player== xPlayer) {
             return oPlayer;
@@ -106,7 +106,7 @@ contract tictactoe {
     
     /// @author Robert Watkins
     /// @notice validate that the player making the move is an X or O and it's their turn 
-    function isValidPlayer(bytes1 player) view private returns (bool){
+    function isValidPlayer(bytes9 player) view private returns (bool){
         bool validPlayer;
         validPlayer = (player == nextPlayer)
                       && ((player == xPlayer)||(player == oPlayer));
