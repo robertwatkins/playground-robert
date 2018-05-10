@@ -54,7 +54,7 @@ contract tictactoe {
     /// 3 | 4 | 5 
     ///---+---+---
     /// 6 | 7 | 8
-    function makeMove(bytes9 playerMakingMove, uint256 moveLocation) payable public returns (bytes9){
+    function makeMove(bytes9 playerMakingMove, uint256 moveLocation) payable public returns (bytes1){
         require (isValidPlayer(playerMakingMove),"Invalid Player");
         require (isValidMoveLocation(moveLocation), "Invalid Move");
         nextPlayer = playerAfter(playerMakingMove);
