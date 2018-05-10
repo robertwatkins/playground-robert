@@ -70,6 +70,11 @@ Implement the following methods
  - return: the player whose turn it is
  - require: there is a game in progress
 
+*function: reset*
+ - This will reset the game to an 'unplayed' state to allow for recovery from abandoned games.
+ - require: only the owner of the instance can initiate this function
+
+
 ## Version 3
 Create a Javascript UI to interact with the game built in version 2 using a browser and the 'metamask' browser extension
 
