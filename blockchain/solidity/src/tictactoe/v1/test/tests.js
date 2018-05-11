@@ -56,27 +56,76 @@ contract('Tictactoe Test', async (accounts) => {
     let gameState = await game.getGameState();
     printGameState(gameState);
   });
-/*
+
   it("should start with an empty game state.", async() => {
-    assert.fail("Not Implemented");
+    console.log('------------------------');
+    console.log("should start with an empty game state.");
+    let game = await tictactoe.new();
+    let gameState = await game.getGameState();
+    assert.equal(gameState,0);
   });
+
 
   it("should show the game state that includes the most recent move.", async() => {
-    assert.fail("Not Implemented");
-  });
-
-  it("After a winning game, the game state should be empty.", async() => {
-    assert.fail("Not Implemented");
+    console.log('------------------------');
+    console.log("should show the game state that includes the most recent move.");
+    let game = await tictactoe.new();
+    await game.makeMove('0x11',0);
+    console.log("X to space 0");
+    await game.makeMove('0xaa',3);
+    console.log("O to space 3");
+    await game.makeMove('0x11',1);
+    console.log("X to space 1");
+    await game.makeMove('0xaa',4);
+    console.log("O to space 4");
+    await game.makeMove('0x11',2);
+    console.log("X to space 2");
+    let gameState = await game.getGameState();
+    console.log("Assert the actual game state:")
+    printGameState(gameState);
+    console.log("Is the same as the expected game state:");
+    let expectedGameState = "0x111111aaaa00000000"
+    printGameState(expectedGameState)
+    assert.equal(gameState,expectedGameState)
   });
 
   it("Only the X player can go first.", async() => {
-    assert.fail("Not Implemented");
+    console.log('------------------------');
+    console.log("Only the X player can go first.");
+    let game = await tictactoe.new();
+    assertRevert(game.makeMove('0xaa',3));
+    console.log("O attempts to move to space 3");
+    let gameState = await game.getGameState();
+    console.log("Current game state:");
+    printGameState(gameState);
+    await game.makeMove('0x11',1);
+    console.log("X to space 1");
+    gameState = await game.getGameState();
+    console.log("Current game state:");
+    printGameState(gameState);
+    assert.equal(gameState,"0x001100000000000000");
   });
 
   it("if no winner exists and no moves are left, then it's a cat's game.", async() => {
-    assert.fail("Not Implemented");
+    console.log('------------------------');
+    console.log("if no winner exists and no moves are left, then it's a cat's game.");
+    let game = await tictactoe.new();
+    await game.makeMove('0x11',0);
+    await game.makeMove('0xaa',3);
+    await game.makeMove('0x11',1);
+    await game.makeMove('0xaa',4);
+    await game.makeMove('0x11',5);
+    await game.makeMove('0xaa',2);
+    await game.makeMove('0x11',6);
+    await game.makeMove('0xaa',7);
+    await game.makeMove('0x11',8);
+    let winner = await game.showWinner();
+    console.log('winner:' + winner);
+    let gameState = await game.getGameState();
+    printGameState(gameState);
+    assert.equal(winner.valueOf(), '0xff');
   });
-*/
+
 
 })
 
