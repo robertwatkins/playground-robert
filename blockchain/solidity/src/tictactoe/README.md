@@ -47,6 +47,7 @@ alternates until the winner is not 'NONE'.
 Implement the following methods
 
 *function: playGame*
+When 'X' joins the game, the game state and the players are reset, then the new player joining will be 'X'.
  - return: one of 'X' or 'O'. The first player to join will be 'O' the second will be 'X' 
  - require: there is no game in progress. A game is in progress when both players have joined.
 
@@ -78,3 +79,5 @@ Implement the following methods
 ## Version 3
 Create a Javascript UI to interact with the game built in version 2 using a browser and the 'metamask' browser extension
 
+## Version 4
+Add to UI the ability to replay all games.
