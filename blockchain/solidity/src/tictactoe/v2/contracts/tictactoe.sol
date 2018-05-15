@@ -5,21 +5,42 @@ pragma solidity ^0.4.0;
 /// @notice An experiment in writing Solidity
 contract tictactoe {
     address owner;
+    address xPlayerAddress;
+    address oPlayerAddress;
     bytes9 gameState;
     bytes9 nextPlayer;
     
+    
     // Players and Winner Options
-    bytes1 constant xPlayer = 0x11;
-    bytes1 constant oPlayer = 0xAA;
-    bytes1 constant unplayed = 0x00;
-    bytes1 constant cat = 0xFF;
+    bytes1 constant xPlayerMark = 0x11;
+    bytes1 constant oPlayerMark = 0xAA;
+    bytes1 constant unplayedMark = 0x00;
+    bytes1 constant catMark = 0xFF;
+    address constant noAddress = 0x0;
+    bytes9 constant gameWithNomoves =  0x000000000000000000;
         
     constructor() payable public{
         owner = msg.sender;
-        gameState = 0x000000000000000000;
-        nextPlayer = xPlayer;
+        xPlayerAddress = noAddress;
+        oPlayerAddress = noAddress;
+        gameState = gameWithNomoves;
+        nextPlayer = xPlayerMark;
     }
 
+    /// @author Robert Watkins
+    /// @notice If there is no game in progress, you will be assigned either the 'X' or 'O' mark for the game.
+    /// @dev By convention we will use '0x11' for 'X' and '0xAA' for 'O'
+    function playGame() payable public returns(bytes1) {
+        require (!gameInProgress(),"There is a game in progress. Please wait until that game is complete before joining.");
+        if (xPlayerAddress != noAddress) {
+            xPlayerAddress = msg.sender;
+            return xPlayerMark;
+        } else {
+            oPlayerAddress = msg.sender;
+            return oPlayerMark;
+        }
+        
+    }
     function kill() public {
         if (msg.sender == owner) selfdestruct(owner);
     }
@@ -34,13 +55,13 @@ contract tictactoe {
         (validGame, winner) = isValidGameState();
         require(validGame,"Not a valid game state.");
         
-        if (winner == unplayed){
+        if (winner == unplayedMark){
             bool isCatWinner = true; 
             uint i;
             for (i=0; i<9; i++){
-                isCatWinner = (isCatWinner && (gameState[i] != unplayed));
+                isCatWinner = (isCatWinner && (gameState[i] != unplayedMark));
             }
-            if (isCatWinner) {winner = cat;}
+            if (isCatWinner) {winner = catMark;}
         }
         return winner;
     }
@@ -79,13 +100,21 @@ contract tictactoe {
     }
     
     /// @author Robert Watkins
+    /// @notice returns a boolean 'False' if there is no game in progress and 'True' if there is a game in progress
+    function gameInProgress() view private returns (bool) {
+        bool isGameInProgress = (gameState != gameWithNomoves ) 
+                             || ((gameState == gameWithNomoves) && (xPlayerAddress != noAddress) && (oPlayerAddress != noAddress));
+        return isGameInProgress;
+    }
+    
+    /// @author Robert Watkins
     /// @notice returns the player to play next, based on the current player
     function playerAfter(bytes9 player) view private returns (bytes1) {
         require(isValidPlayer(player));
-        if (player== xPlayer) {
-            return oPlayer;
+        if (player== xPlayerMark) {
+            return oPlayerMark;
         } else {
-            return xPlayer;
+            return xPlayerMark;
         }
     }
     
@@ -100,7 +129,7 @@ contract tictactoe {
     function isValidMoveLocation (uint256 location) view private returns (bool){
         bool validMove;
         validMove = ((location >= 0x0) && (location <= 0x8));
-        validMove = (gameState[location] == unplayed);
+        validMove = (gameState[location] == unplayedMark);
         return validMove;
     }
     
@@ -109,7 +138,7 @@ contract tictactoe {
     function isValidPlayer(bytes9 player) view private returns (bool){
         bool validPlayer;
         validPlayer = (player == nextPlayer)
-                      && ((player == xPlayer)||(player == oPlayer));
+                      && ((player == xPlayerMark)||(player == oPlayerMark));
         return validPlayer;
     }
     /// @author Robert Watkins
@@ -124,9 +153,9 @@ contract tictactoe {
       //playing spaces should only have valid entries (X,O,unplayed)
       for (i=0; i<9; i++){
         currentSpaceValue = gameState[i];
-        if (currentSpaceValue == xPlayer) {xPlayerCount++;}
-        if (currentSpaceValue == oPlayer) {oPlayerCount++;}
-        validPlayers = (validPlayers && (currentSpaceValue == xPlayer || currentSpaceValue == oPlayer || currentSpaceValue == unplayed) );
+        if (currentSpaceValue == xPlayerMark) {xPlayerCount++;}
+        if (currentSpaceValue == oPlayerMark) {oPlayerCount++;}
+        validPlayers = (validPlayers && (currentSpaceValue == xPlayerMark || currentSpaceValue == oPlayerMark || currentSpaceValue == unplayedMark) );
       }
       
       //the difference in the number of moves for each player should not be off by more than 1
@@ -144,9 +173,9 @@ contract tictactoe {
     function countIfMatching (uint256 playerMoveAtLocation1, uint256 playerMoveAtLocation2, uint256 playerMoveAtLocation3) view private returns (int, bytes1) {
         int count = 0;
 
-        bytes1 matchingValue = unplayed;
-        if (gameState[playerMoveAtLocation1] != unplayed) {
-            if ((gameState[playerMoveAtLocation1] == xPlayer || gameState[playerMoveAtLocation1] == oPlayer) 
+        bytes1 matchingValue = unplayedMark;
+        if (gameState[playerMoveAtLocation1] != unplayedMark) {
+            if ((gameState[playerMoveAtLocation1] == xPlayerMark || gameState[playerMoveAtLocation1] == oPlayerMark) 
                     &&(gameState[playerMoveAtLocation1] == gameState[playerMoveAtLocation2] 
                     && gameState[playerMoveAtLocation2] == gameState[playerMoveAtLocation3])){
                count++;
@@ -162,7 +191,7 @@ contract tictactoe {
     ///      This implies that if there is exactly one winner, it is the last one found.
     function hasOnlyOneWinner() view private returns (bool, bytes1){
 
-        bytes1 lastFoundWinner = unplayed;
+        bytes1 lastFoundWinner = unplayedMark;
         bytes1 matchingValue;
         int count;
         int totalWinnerCount = 0;
