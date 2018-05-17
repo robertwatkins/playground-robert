@@ -35,7 +35,12 @@ contract tictactoe {
         require (!gameInProgress(),"There is a game in progress. Please wait until that game is complete before joining.");
         if (xPlayerAddress == noAddress) {
             xPlayerAddress = msg.sender;
+        } else if (oPlayerAddress == noAddress) {
+            oPlayerAddress = msg.sender;
+        } else {
+            revert("The game already has enough players.");
         }
+        
     }
     
     /// @author Robert Watkins
@@ -125,6 +130,13 @@ contract tictactoe {
         }
         return unplayedMark;
     }
+    
+    /// @notice list the players
+    /// @dev by convention, X is listed first 
+    function listPlayers() view public returns (address[2]){
+        return [xPlayerAddress,oPlayerAddress];
+    }
+    
     
     /// @author Robert Watkins
     /// @notice returns a boolean 'False' if there is no game in progress and 'True' if there is a game in progress
