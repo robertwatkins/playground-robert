@@ -46,10 +46,12 @@ alternates until the winner is not 'NONE'.
 
 Implement the following methods
 
-*function: playGame*
+*function: joinGame*
 When 'X' joins the game, the game state and the players are reset, then the new player joining will be 'X'.
- - return: one of 'X' or 'O'. The first player to join will be 'O' the second will be 'X' 
  - require: there is no game in progress. A game is in progress when both players have joined.
+
+*function: getMyMark*
+ - return: returns the message sender's mark. If the message sender is not a player, the 'NONE' mark is sent '0x0'
 
 *function: makeMove*
  - param: location on board for the move

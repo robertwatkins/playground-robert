@@ -8,7 +8,7 @@ contract tictactoe {
     address xPlayerAddress;
     address oPlayerAddress;
     bytes9 gameState;
-    bytes9 nextPlayer;
+    bytes9 nextPlayerMark;
     
     
     // Players and Winner Options
@@ -24,23 +24,36 @@ contract tictactoe {
         xPlayerAddress = noAddress;
         oPlayerAddress = noAddress;
         gameState = gameWithNomoves;
-        nextPlayer = xPlayerMark;
+        nextPlayerMark = xPlayerMark;
     }
 
     /// @author Robert Watkins
     /// @notice If there is no game in progress, you will be assigned either the 'X' or 'O' mark for the game.
     /// @dev By convention we will use '0x11' for 'X' and '0xAA' for 'O'
-    function playGame() payable public returns(bytes1) {
+    ///      There is nothing preventing the same person playing both 'X' and 'O'
+    function joinGame() payable public {
         require (!gameInProgress(),"There is a game in progress. Please wait until that game is complete before joining.");
-        if (xPlayerAddress != noAddress) {
+        if (xPlayerAddress == noAddress) {
             xPlayerAddress = msg.sender;
+        }
+    }
+    
+    /// @author Robert Watkins
+    /// @notice Return the mark of the message sender.
+    /// @dev By convention we will use '0x11' for 'X', '0xAA' for 'O' and '0x0' for 'Not a player'
+    ///      There is a side-effect that if the same player is both 'X' and 'O', only the 'X' mark is returned
+    function getMyMark() view public returns (bytes1){
+        if (msg.sender == xPlayerAddress) {
             return xPlayerMark;
-        } else {
-            oPlayerAddress = msg.sender;
+        }
+        
+        if (msg.sender == oPlayerAddress) {
             return oPlayerMark;
         }
         
+        return unplayedMark;
     }
+    
     function kill() public {
         if (msg.sender == owner) selfdestruct(owner);
     }
@@ -75,15 +88,16 @@ contract tictactoe {
     /// 3 | 4 | 5 
     ///---+---+---
     /// 6 | 7 | 8
-    function makeMove(bytes9 playerMakingMove, uint256 moveLocation) payable public returns (bytes1){
-        require (isValidPlayer(playerMakingMove),"Invalid Player");
+    function makeMove(uint256 moveLocation) payable public {
+        
+        require (isValidPlayer(msg.sender),"Invalid Player");
         require (isValidMoveLocation(moveLocation), "Invalid Move");
-        nextPlayer = playerAfter(playerMakingMove);
+        bytes1 playerMakingMove = getPlayerMark(msg.sender);
+        nextPlayerMark = playerAfter(playerMakingMove);
         //create an empty game and add the players move in location, 
         //then use bitwise 'or' to modifiy the gamestate
         bytes9 moveMask = playerMakingMove >> (moveLocation * 8);
         gameState = gameState | moveMask;
-        return showWinner();
     }
 
     /// @author Robert Watkins
@@ -100,6 +114,19 @@ contract tictactoe {
     }
     
     /// @author Robert Watkins
+    /// @return the mark associated with the message sender (if any)
+    /// @dev By convention we will use '0x00' for a space not played, '0x11' for 'X' and '0xAA' for 'O', '0x0' for 'Not a player' 
+    function getPlayerMark(address playerAddress) view private returns (bytes1){
+        if (playerAddress == xPlayerAddress) {
+            return xPlayerMark;
+        }
+        if (playerAddress == oPlayerAddress) {
+            return oPlayerMark;
+        }
+        return unplayedMark;
+    }
+    
+    /// @author Robert Watkins
     /// @notice returns a boolean 'False' if there is no game in progress and 'True' if there is a game in progress
     function gameInProgress() view private returns (bool) {
         bool isGameInProgress = (gameState != gameWithNomoves ) 
@@ -109,8 +136,7 @@ contract tictactoe {
     
     /// @author Robert Watkins
     /// @notice returns the player to play next, based on the current player
-    function playerAfter(bytes9 player) view private returns (bytes1) {
-        require(isValidPlayer(player));
+    function playerAfter(bytes9 player) pure private returns (bytes1) {
         if (player== xPlayerMark) {
             return oPlayerMark;
         } else {
@@ -135,12 +161,14 @@ contract tictactoe {
     
     /// @author Robert Watkins
     /// @notice validate that the player making the move is an X or O and it's their turn 
-    function isValidPlayer(bytes9 player) view private returns (bool){
+    function isValidPlayer(address playerAddress) view private returns (bool){
+        bytes1 player = getPlayerMark(playerAddress);
         bool validPlayer;
-        validPlayer = (player == nextPlayer)
+        validPlayer = (player == nextPlayerMark)
                       && ((player == xPlayerMark)||(player == oPlayerMark));
         return validPlayer;
     }
+    
     /// @author Robert Watkins
     /// @dev We are simply counting the instances of each players mark to ensure there is no obvious cheating.
     function validPlayersTakingTurns() view private returns (bool){
@@ -234,5 +262,6 @@ contract tictactoe {
     }
 
 }
+
 
 
