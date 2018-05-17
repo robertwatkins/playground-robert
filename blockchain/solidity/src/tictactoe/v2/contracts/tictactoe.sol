@@ -97,7 +97,12 @@ contract tictactoe {
         
         require (isValidPlayer(msg.sender),"Invalid Player");
         require (isValidMoveLocation(moveLocation), "Invalid Move");
-        bytes1 playerMakingMove = getPlayerMark(msg.sender);
+        bytes1 playerMakingMove;
+        if (samePersonPlayingXandO()){
+            playerMakingMove = nextPlayerMark[0];
+        } else {
+            playerMakingMove = getPlayerMark(msg.sender);
+        }
         nextPlayerMark = playerAfter(playerMakingMove);
         //create an empty game and add the players move in location, 
         //then use bitwise 'or' to modifiy the gamestate
@@ -137,6 +142,10 @@ contract tictactoe {
         return [xPlayerAddress,oPlayerAddress];
     }
     
+    /// @notice Detect if the same user is playing both X and O 
+    function samePersonPlayingXandO() view private returns (bool){
+        return (xPlayerAddress == oPlayerAddress);
+    }
     
     /// @author Robert Watkins
     /// @notice returns a boolean 'False' if there is no game in progress and 'True' if there is a game in progress
