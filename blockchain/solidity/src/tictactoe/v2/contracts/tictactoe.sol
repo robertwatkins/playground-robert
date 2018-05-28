@@ -17,13 +17,13 @@ contract tictactoe {
     bytes1 constant unplayedMark = 0x00;
     bytes1 constant catMark = 0xFF;
     address constant noAddress = 0x0;
-    bytes9 constant gameWithNomoves =  0x000000000000000000;
+    bytes9 constant gameWithNoMoves =  0x000000000000000000;
         
     constructor() payable public{
         owner = msg.sender;
         xPlayerAddress = noAddress;
         oPlayerAddress = noAddress;
-        gameState = gameWithNomoves;
+        gameState = gameWithNoMoves;
         nextPlayerMark = xPlayerMark;
     }
 
@@ -150,8 +150,8 @@ contract tictactoe {
     /// @author Robert Watkins
     /// @notice returns a boolean 'False' if there is no game in progress and 'True' if there is a game in progress
     function gameInProgress() view private returns (bool) {
-        bool isGameInProgress = (gameState != gameWithNomoves ) 
-                             || ((gameState == gameWithNomoves) && (xPlayerAddress != noAddress) && (oPlayerAddress != noAddress));
+        bool isGameInProgress = (gameState != gameWithNoMoves ) 
+                             || ((gameState == gameWithNoMoves) && (xPlayerAddress != noAddress) && (oPlayerAddress != noAddress));
         return isGameInProgress;
     }
     
