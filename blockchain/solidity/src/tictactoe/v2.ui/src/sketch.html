@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-<title>W3.CSS Template</title>
+<title>Tic Tac Toe</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
@@ -13,8 +13,7 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
 
 <!-- Top container -->
 <div class="w3-bar w3-top w3-black w3-large" style="z-index:4">
-  <button class="w3-bar-item w3-button w3-hide-large w3-hover-none w3-hover-text-light-grey" onclick="w3_open();"><i class="fa fa-bars"></i>  Menu</button>
-  <span class="w3-bar-item w3-right">Logo</span>
+  <span class="w3-bar-item w3-right">Brought to you by Red Earth Security</span>
 </div>
 
 <div class="w3-main" style="margin-top:43px;">
@@ -24,7 +23,7 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
   </header>
   <div class="w3-center" >
   <div class="w3-row-padding w3-margin-bottom">
-    <div class="w3-quarter">
+    <div class="w3-half">
       <div class="w3-container w3-blue w3-padding-16">
         <div class="w3-left"><i class="fa fa-user-circle-o w3-xxxlarge"></i></div>
         <div class="w3-right">
@@ -34,7 +33,7 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
         <h4>[Your Name]</h4>
       </div>
     </div>
-    <div class="w3-quarter">
+    <div class="w3-half">
       <div class="w3-container w3-teal w3-padding-16">
         <div class="w3-left"><i class="fa fa-user-circle w3-xxxlarge"></i></div>
         <div class="w3-right">
@@ -45,95 +44,210 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
       </div>
     </div>
   </div>
-    <div class="w3-panel">
-        <div class="w3-half">
-            <canvas id="myCanvas" width="300" height="300">
-            </canvas>
+    <div class="w3-row-padding w3-margin-bottom">
+        <div class="w3-half ">
+            <div class="w3-container w3-padding-16">
+                <canvas id="tictactoeboard" width="300" height="300"></canvas>
+            </div>
         </div>
-    </div>
+        <div class="w3-half">
+          <div class="w3-container w3-indigo w3-padding-16">
+            <div class="w3-clear">
+              <h3 id="currentPlayerIndicator">Waiting</h3>
+            </div>
+            <div class="w3-clear"></div>
+            <h4 id="currentPlayerIndicatorAddendum">to start game</h4>
+          </div>
+        </div>
+      </div>
   </div>   
   <hr>
-  
-  <!-- Footer -->
-  <footer class="w3-container w3-padding-16 w3-light-grey">
-    <h4>brought to you by Red Earth Security</h4>
-  </footer>
-
   <!-- End page content -->
 </div>
 
 <script>
-var scale = 300;
-var width = scale / 20;
-var boardColor = 'black';
-var xColor = '#009688';
-var oColor = '#2196F3';
-var fillColor = 'white';
-createBoard();
-    
-var myMark1 = "X";
-var myMark2 = "O";
-play(myMark1,0);
-play(myMark2,1);
-play(myMark1,2);
-play(myMark2,3);
-play(myMark1,4);
-play(myMark2,5);
-play(myMark1,6);
-play(myMark2,7);
-play(myMark1,8);
-
-    
-function play(mark, location) {
-    xOffset = (location % 3) * (scale / 3) + (scale / 6);
-    yOffset = Math.floor(location / 3) * (scale / 3) + (scale / 6);
-    var c = document.getElementById("myCanvas");
+    //By convention the smart contract will use '0x00' for a space not played, '0x11' for 'X' and '0xAA' for 'O', 'CAT' (0xFF).
+    var currentPlayerTurn = "X";
+    var currentMoves = ["","","","","","","","",""];
+    var scale = 300;
+    var width = scale / 20;
+    var boardColor = 'black';
+    var xColor = '#009688';
+    var oColor = '#2196F3';
+    var fillColor = 'white';
+    var c = document.getElementById("tictactoeboard");
     var ctx = c.getContext("2d");
-    ctx.lineWidth = width;
-    
-    if (mark == "X"){
-        ctx.beginPath();
-        ctx.strokeStyle = xColor;
-        ctx.moveTo(xOffset + (scale/9),yOffset + (scale/9));
-        ctx.lineTo(xOffset - (scale/9),yOffset - (scale/9));
-        ctx.stroke();
-        
-        ctx.beginPath();
-        ctx.moveTo(xOffset + (scale/9),yOffset - (scale/9));
-        ctx.lineTo(xOffset - (scale/9),yOffset + (scale/9));
-        ctx.stroke();
-    } else {
-        ctx.beginPath();
-        ctx.arc(xOffset, yOffset, scale/9 , 0, 2 * Math.PI, false);
-        ctx.strokeStyle = oColor;
-        ctx.fillStyle = fillColor;
-        ctx.fill();
-        ctx.stroke();  
+    c.addEventListener('mousemove', function(evt) {
+        var mousePos = getMousePos(c, evt);
+        showTurn(mousePos.x, mousePos.y);
+    }, false);
+    c.addEventListener('click', function(evt) { 
+        var mousePos = getMousePos(c, evt);
+        makeMove(mousePos.x, mousePos.y);
+    }, false);
+    createBoard();
+    drawCurrentMoves();
+
+    function makeMove(x,y){
+        var location = getLocationFromMousePosition(x, y);
+        if (location >=0 && location <=8 ) {
+            if(currentMoves[location]==""){
+                currentMoves[location]=currentPlayerTurn;
+                endCurrentPlayersTurn();
+                createBoard();
+                drawCurrentMoves();
+            }
+        }
     }
-}
     
-function createBoard() {
-    var c = document.getElementById("myCanvas");
-    var ctx = c.getContext("2d");
-    ctx.lineWidth = width;
-    ctx.strokeStyle = boardColor;
+    function endCurrentPlayersTurn(){
+        if (currentPlayerTurn == "X"){
+            currentPlayerTurn = "O";
+        } else {
+            currentPlayerTurn = "X";
+        }
+        updateCurrentPlayerIndicator();
+    }
+    
+    function updateCurrentPlayerIndicator(){
+        var currentPlayerIndicator = document.getElementById("currentPlayerIndicator");
+        currentPlayerIndicator.innerHTML = "Player " + currentPlayerTurn;
+        
+        var currentPlayerIndocatorAddendum = document.getElementById("currentPlayerIndicatorAddendum");
+        currentPlayerIndicatorAddendum.innerHTML = "Turn";
+        
+    }
+    
+    
+    function showTurn(x, y){
+        ctx.clearRect(0, 0, c.width, c.height);
+        createBoard();
+        drawCurrentMoves();
+        makeMarkUnderMouse(x, y);
+    };
 
-    ctx.moveTo(scale/3, 0);
-    ctx.lineTo(scale/3, scale);
-    ctx.stroke(); 
+    function makeMarkUnderMouse(x, y){
+        var location = getLocationFromMousePosition(x, y);
+        if (location >=0 && location <=8 ) {
+            if(currentMoves[location]==""){
+                makeMarkAtLocation(currentPlayerTurn,location);
+                //todo remove this and get move from other player makeMarkAtLocation("X",location);
+            }
+        }
+    }
+    
+    function getLocationFromMousePosition(x, y){
+        var location = -1;
+        if (y < (scale/3)) {
+            if (x < (scale/3)){
+                location = 0;
+            } else if(x < (2* scale / 3)){
+                location = 1;
+            } else {
+                location = 2;
+            }
+        } 
+        else if (y < (2 * scale / 3)) {
+            if (x < (scale/3)){
+                location = 3;
+            } else if(x < (2* scale / 3)){
+                location = 4;
+            } else {
+                location = 5;
+            }
+        } else {    
+            if (x < (scale/3)){
+                location = 6;
+            } else if(x < (2* scale / 3)){
+                location = 7;
+            } else {
+                location = 8;
+            }
+        }
+        console.log(location);
+        return location;
+    }
+    function drawCurrentMoves(){
+        for (i=0; i<9 ; i++){
+            makeMarkAtLocation(currentMoves[i],i);
+        }
+    }
 
-    ctx.moveTo(2*scale/3, 0);
-    ctx.lineTo(2*scale/3, scale);
-    ctx.stroke(); 
+    function checkPositioning() {    
+        var myMark1 = "X";
+        var myMark2 = "O";
+        makeMarkAtLocation(myMark1,0);
+        makeMarkAtLocation(myMark2,1);
+        makeMarkAtLocation(myMark1,2);
+        makeMarkAtLocation(myMark2,3);
+        makeMarkAtLocation(myMark1,4);
+        makeMarkAtLocation(myMark2,5);
+        makeMarkAtLocation(myMark1,6);
+        makeMarkAtLocation(myMark2,7);
+        makeMarkAtLocation(myMark1,8);
+    }
 
-    ctx.moveTo(0, scale/3);
-    ctx.lineTo(scale, scale/3);
-    ctx.stroke(); 
+    function makeMarkAtLocation(mark, location) {
+        xOffset = (location % 3) * (scale / 3) + (scale / 6);
+        yOffset = Math.floor(location / 3) * (scale / 3) + (scale / 6);
+        var c = document.getElementById("tictactoeboard");
+        var ctx = c.getContext("2d");
 
-    ctx.moveTo(0, 2*scale/3);
-    ctx.lineTo(scale, 2*scale/3);
-    ctx.stroke(); 
-}
+        ctx.lineWidth = width;
+
+        if (mark == "X"){
+            ctx.beginPath();
+            ctx.strokeStyle = xColor;
+            ctx.moveTo(xOffset + (scale/9),yOffset + (scale/9));
+            ctx.lineTo(xOffset - (scale/9),yOffset - (scale/9));
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(xOffset + (scale/9),yOffset - (scale/9));
+            ctx.lineTo(xOffset - (scale/9),yOffset + (scale/9));
+            ctx.stroke();
+        } else  if ( mark == "O") {
+            ctx.beginPath();
+            ctx.arc(xOffset, yOffset, scale/9 , 0, 2 * Math.PI, false);
+            ctx.strokeStyle = oColor;
+            ctx.fillStyle = fillColor;
+            ctx.fill();
+            ctx.stroke();  
+        } else {
+            //no mark to be made
+        }
+    }
+
+    function createBoard() {
+        var c = document.getElementById("tictactoeboard");
+        var ctx = c.getContext("2d");
+        ctx.lineWidth = width;
+        ctx.strokeStyle = boardColor;
+
+        ctx.moveTo(scale/3, 0);
+        ctx.lineTo(scale/3, scale);
+        ctx.stroke(); 
+
+        ctx.moveTo(2*scale/3, 0);
+        ctx.lineTo(2*scale/3, scale);
+        ctx.stroke(); 
+
+        ctx.moveTo(0, scale/3);
+        ctx.lineTo(scale, scale/3);
+        ctx.stroke(); 
+
+        ctx.moveTo(0, 2*scale/3);
+        ctx.lineTo(scale, 2*scale/3);
+        ctx.stroke(); 
+    }
+
+    function getMousePos(canvas, evt) {
+        var rect = canvas.getBoundingClientRect();
+        return {
+          x: evt.clientX - rect.left,
+          y: evt.clientY - rect.top
+        };
+    }    
 </script>
 
 </body>
