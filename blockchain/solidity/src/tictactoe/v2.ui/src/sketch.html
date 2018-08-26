@@ -6,6 +6,7 @@
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script type="text/javascript" src="web3.min.js"></script>
 <style>
 html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
 </style>
@@ -30,7 +31,7 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
           <h3>You (O)</h3>
         </div>
         <div class="w3-clear"></div>
-        <h4>[Your Name]</h4>
+        <h4>[Your Name]</h4><input id="o-player-address" value="0x2C26D29abA30e555eD4f25A3F3F800c0Cdc15776"><input type="button" value="Start">
       </div>
     </div>
     <div class="w3-half">
@@ -40,7 +41,9 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
           <h3>Opponent (X)</h3>
         </div>
         <div class="w3-clear"></div>
-        <h4>[Opponent Name]</h4>
+          <h4>[Opponent Name]</h4><input id="x-player-address" value="0x31b6Fd2AC4Bf067BC5B0EB3B1b7c92f7b9acCB97"/>
+          <input type="button" value="Join">
+          <div id="balance"></div>
       </div>
     </div>
   </div>
@@ -56,7 +59,7 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
               <h3 id="currentPlayerIndicator">Waiting</h3>
             </div>
             <div class="w3-clear"></div>
-            <h4 id="currentPlayerIndicatorAddendum">to start game</h4>
+            <h4 id="currentPlayerIndicatorAddendum">to start game</h4><input id="address" value="0x0a8719e03f24703383160cb9e4cc0e391e71c8a4">
           </div>
         </div>
       </div>
@@ -87,6 +90,66 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
     }, false);
     createBoard();
     drawCurrentMoves();
+    
+    
+    //todo find example for connecting to network, calling contract with parameters
+    //todo find a polling mechanism to keep status updated
+    //http://hypernephelist.com/2016/06/21/a-simple-smart-contract-ui-web3.html
+    
+    //var web3 = new Web3(new Web3.providers.HttpProvider("http://127.0.0.1:7545"));
+
+    //if (typeof web3 === 'undefined') {
+    //  alert('You need to install MetaMask to use this feature.  https://metamask.io')
+    //}
+    //var game_address = "0x9686d33515d8854e3af39346c3c24c6042136ded"
+
+//  web3.eth.sendTransaction({
+//    to: game_address,
+//    from: user_address,
+//    value: web3.toWei('1', 'ether'),
+//  }, function (err, transactionHash) {
+//    if (err) return renderMessage('Oh no!: ' + err.message)
+
+    // If you get a transactionHash, you can assume it was sent,
+    // or if you want to guarantee it was received, you can poll
+    // for that transaction to be mined first.
+//    renderMessage('Thanks!')
+//  }
+
+window.addEventListener('load', function() {
+
+    // Checking if Web3 has been injected by the browser (Mist/MetaMask)
+    if (typeof web3 !== 'undefined') {
+        // Use Mist/MetaMask's provider
+        web3js = new Web3(web3.currentProvider);
+    } else {
+        console.log('No web3? You should consider trying MetaMask!')
+        // fallback - use your fallback strategy (local node / hosted node +     in-dapp id mgmt / fail)
+        web3js = new Web3(new Web3.providers.HttpProvider("http://localhost:7545"));
+    }
+
+    var user_address = web3js.eth.accounts[0];
+    var balanceWei;
+    console.log(user_address);
+    user_address = "0x2C26D29abA30e555eD4f25A3F3F800c0Cdc15776";
+    //use callbacks
+    //https://github.com/ethereum/wiki/wiki/JavaScript-API#using-callbacks
+    //old version-var balanceWei = web3js.eth.getBalance(user_address).toNumber();
+    //new version below
+    web3js.eth.getBalance(user_address, function(error, balanceWei){
+   if(!error)
+       console.log(JSON.stringify(balanceWei));
+   else
+       console.error(error);
+    })
+    
+    var balance = web3js.fromWei(balanceWei, 'ether');
+    balanceElement =  document.getElementById("balance");
+    balanceElement.innerHTML = balance;
+
+
+})
+
 
     function makeMove(x,y){
         var location = getLocationFromMousePosition(x, y);
