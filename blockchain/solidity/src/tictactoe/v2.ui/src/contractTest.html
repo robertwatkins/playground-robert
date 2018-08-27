@@ -1,0 +1,207 @@
+<html>
+<script>
+    //By convention the smart contract will use '0x00' for a space not played, '0x11' for 'X' and '0xAA' for 'O', 'CAT' (0xFF).
+    var web3;
+    var web3js;
+    var balance;
+    var xPlayerAddress;
+    var oPlayerAddress;
+    var gameAddress;
+    var abiArray = [
+	{
+		"constant": false,
+		"inputs": [],
+		"name": "joinGame",
+		"outputs": [],
+		"payable": true,
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [],
+		"name": "kill",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "moveLocation",
+				"type": "uint256"
+			}
+		],
+		"name": "makeMove",
+		"outputs": [],
+		"payable": true,
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"payable": true,
+		"stateMutability": "payable",
+		"type": "constructor"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "getGameState",
+		"outputs": [
+			{
+				"name": "",
+				"type": "bytes9"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "getMyMark",
+		"outputs": [
+			{
+				"name": "",
+				"type": "bytes1"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "listPlayers",
+		"outputs": [
+			{
+				"name": "",
+				"type": "address[2]"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "showWinner",
+		"outputs": [
+			{
+				"name": "",
+				"type": "bytes1"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	}
+]
+    var ticTacToeContract = web3.eth.contract(abiArray);
+    var ticTacToeContractInstance;
+    var currentPlayerTurn = "X";
+    var currentMoves = ["","","","","","","","",""];
+
+
+
+function initializeGame(){    
+    xPlayerAddress = "0x2C26D29abA30e555eD4f25A3F3F800c0Cdc15776";
+    oPlayerAddress = "0x31b6Fd2AC4Bf067BC5B0EB3B1b7c92f7b9acCB97";
+    gameAddress = "0xcaad14b7d410ebbf77f1b63c5ce869a017e80ae3";
+
+    ticTacToeContractInstance = ticTacToeContract.at(gameAddress);
+    web3.eth.defaultAccount = oPlayerAddress;
+    web3.personal.unlockAccount(web3.eth.defaultAccount,playGame);
+}
+
+function playGame(){
+    web3js.eth.getBalance(xPlayerAddress, updateBalance);
+    ticTacToeContractInstance.listPlayers(logPlayers);
+    ticTacToeContractInstance.getGameState(logGameState);
+    ticTacToeContractInstance.getMyMark(logMyMark);
+    //ticTacToeContractInstance.makeMove("moveLocation",8, {value: 1, gas: 200000}, logMyMove);
+    ticTacToeContractInstance.makeMove(0x8, {value: 1, gas: 200000}, logMyMove);
+    //ticTacToeContractInstance.joinGame({value: 1, gas: 200000}, logJoinGame);
+    
+}
+    
+function logJoinGame (error, msg){
+    if(!error){
+        console.log(msg);
+    }
+    else{
+        console.error(error);
+    } 
+} 
+   
+    
+function logMyMove (error, move){
+    if(!error){
+        console.log("moved " + move);
+    }
+    else{
+        console.error(error);
+    } 
+} 
+    
+ 
+function logMyMark (error, mark){
+    if(!error){
+        console.log("Current Player's Mark" + mark);
+        ticTacToeContractInstance.getGameState(logGameState);
+    }
+    else{
+        console.error(error);
+    } 
+} 
+    
+function logGameState (error, gameState){
+    if(!error){
+        console.log("Game State " + gameState);
+    }
+    else{
+        console.error(error);
+    } 
+}
+
+function logPlayers (error, playerList){
+    if(!error){
+        console.log("Players" + playerList);
+    }
+    else{
+        console.error(error);
+    } 
+}
+    
+function updateBalance(error, balanceWei){
+    if(!error){
+        balance = JSON.stringify(web3js.fromWei(balanceWei, 'ether'));
+        console.log(balance);
+    }
+    else{
+        console.error(error);
+    }
+}
+    
+window.addEventListener('load', function() {
+    // Checking if Web3 has been injected by the browser (Mist/MetaMask)
+    if (typeof web3 !== 'undefined') {
+        // Use Mist/MetaMask's provider
+        web3js = new Web3(web3.currentProvider);
+    } else {
+        console.log('No web3? You should consider trying MetaMask!')
+        // fallback - use your fallback strategy (local node / hosted node +     in-dapp id mgmt / fail)
+        web3js = new Web3(new Web3.providers.HttpProvider("http://localhost:7545"));
+    }
+    initializeGame();
+})
+
+      
+</script>
+</html>
