@@ -31,8 +31,8 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
           <h3>You (O)</h3>
         </div>
         <div class="w3-clear"></div>
-        <h4>[Your Name]</h4><input id="o-player-address" value="0x2C26D29abA30e555eD4f25A3F3F800c0Cdc15776">
-        <input type="button" value="Start">  
+        <h4>[Your Name]</h4><input type=hidden id="o-player-address" value="0x2C26D29abA30e555eD4f25A3F3F800c0Cdc15776">
+        <input type="button" value="Join" onclick=join("O")>  
         <div id="balance"></div>
       </div>
     </div>
@@ -43,8 +43,8 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
           <h3>Opponent (X)</h3>
         </div>
         <div class="w3-clear"></div>
-          <h4>[Opponent Name]</h4><input id="x-player-address" value="0x31b6Fd2AC4Bf067BC5B0EB3B1b7c92f7b9acCB97"/>
-          <input type="button" value="Join">
+          <h4>[Opponent Name]</h4><input type=hidden id="x-player-address" value="0x31b6Fd2AC4Bf067BC5B0EB3B1b7c92f7b9acCB97"/>
+          <input type="button" value="Join" onclick=join("X")>
       </div>
     </div>
   </div>
@@ -60,7 +60,7 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
               <h3 id="currentPlayerIndicator">Waiting</h3>
             </div>
             <div class="w3-clear"></div>
-            <h4 id="currentPlayerIndicatorAddendum">to start game</h4><input id="address" value="0x0a8719e03f24703383160cb9e4cc0e391e71c8a4">
+            <h4 id="currentPlayerIndicatorAddendum">to start game</h4><input id="address" value="">
           </div>
         </div>
       </div>
@@ -201,7 +201,7 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
     }, false);
     createBoard();
     drawCurrentMoves();
-
+    updateTurn();
 
 
 
@@ -212,7 +212,7 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
 function initializeGame(){    
     xPlayerAddress = "0x2c26d29aba30e555ed4f25a3f3f800c0cdc15776";
     oPlayerAddress = "0x31b6fd2ac4bf067bc5b0eb3b1b7c92f7b9accb97";
-    gameAddress = "0xf47c6db95886a3bda73b2d0d9e62578d99ce12d5";
+    gameAddress = "0x4f1cb53e9084558e7f0ae4e51d5ddd703e0180a5";
 
     ticTacToeContractInstance = ticTacToeContract.at(gameAddress);
     web3.eth.defaultAccount = xPlayerAddress;
@@ -220,7 +220,7 @@ function initializeGame(){
 }
 
 function playGame(){
-    web3js.eth.getBalance(xPlayerAddress, updateBalance);
+    web3js.eth.getBalance(oPlayerAddress, updateBalance);
     ticTacToeContractInstance.listPlayers(logPlayers);
     ticTacToeContractInstance.getGameState(updateGameState);
     //ticTacToeContractInstance.getMyMark(logMyMark);
@@ -260,12 +260,13 @@ function logMyMark (error, mark){
 } 
     
 function updateGameState (error, gameState){
-    if(!error){
-        console.log("Game State " + gameState);
+    if(!error && (typeof gameState != 'undefined')){
+        //console.log("Game State " + gameState);
         for (i = 0; i<9; i++){
-            gameStateAsArray = toByteArray(gameState.valueOf());
+            //gameStateAsArray = toByteArray(gameState.valueOf());
+            gameStateAsArray = toByteArray(gameState);
             markAtI = gameStateAsArray[i+1];
-            console.log("Mark at position " + i + ": " + markAtI);
+            //console.log("Mark at position " + i + ": " + markAtI);
             if (markAtI == 0x11){
                 currentMoves[i] = "X";
             } else if (markAtI == 0xaa) {
@@ -274,13 +275,38 @@ function updateGameState (error, gameState){
                 currentMoves[i]="";
             }
         }
+        //console.log("Current Moves : " + currentMoves);
         drawCurrentMoves();
+        updateTurn();
         setTimeout(updateGameState, 1000);
         ticTacToeContractInstance.getGameState(updateGameState);
 }
     else{
-        console.error(error);
+        if (typeof error != 'undefined'){
+            console.error(error);
+        }
     } 
+}
+    
+function updateTurn(){
+    var xCount = 0;
+    var oCount = 0;
+    for (i=0;i<9;i++){
+        if (currentMoves[i]=="X"){
+            xCount++;
+        } else if(currentMoves[i]=="O") {
+            oCount++;
+        }
+    }
+    if (xCount>oCount) {
+        currentPlayerTurn = "O";
+        web3.eth.defaultAccount = oPlayerAddress;
+    } else {
+        currentPlayerTurn = "X";
+        web3.eth.defaultAccount = xPlayerAddress;
+    }
+    //console.log("Current Player: "+ currentPlayerTurn + " : xCount=" + xCount + " : oCount=" + oCount );
+    updateCurrentPlayerIndicator();
 }
 
 function logPlayers (error, playerList){
@@ -300,6 +326,16 @@ function updateBalance(error, balanceWei){
     else{
         console.error(error);
     }
+}
+    
+function join(mark){
+    if (mark = "X"){
+    web3.eth.defaultAccount = xPlayerAddress;
+    } else {
+        web3.eth.defaultAccount = oPlayerAddress;
+    }
+
+    ticTacToeContractInstance.makeMove(0x0, {value: 1, gas: 200000}, logMyMove);
 }
     
 window.addEventListener('load', function() {
@@ -341,7 +377,7 @@ function toByteArray(hexString) {
                 ticTacToeContractInstance.makeMove(location, {value: 1, gas: 200000}, logMyMove);
                 //todo move logic to verify move and ending turn to contract
                 //be sure to update UI
-                endCurrentPlayersTurn();
+                //endCurrentPlayersTurn();
                 createBoard();
                 drawCurrentMoves();
             }
@@ -358,12 +394,18 @@ function toByteArray(hexString) {
     }
     
     function updateCurrentPlayerIndicator(){
-        var currentPlayerIndicator = document.getElementById("currentPlayerIndicator");
-        currentPlayerIndicator.innerHTML = "Player " + currentPlayerTurn;
+        var currentPlayerIndicatorElement = document.getElementById("currentPlayerIndicator");
+        currentPlayerIndicatorElement.innerHTML = "Player " + currentPlayerTurn;
         
-        var currentPlayerIndocatorAddendum = document.getElementById("currentPlayerIndicatorAddendum");
-        currentPlayerIndicatorAddendum.innerHTML = "Turn";
+        var currentPlayerIndicatorAddendumElement = document.getElementById("currentPlayerIndicatorAddendum");
+        currentPlayerIndicatorAddendumElement.innerHTML = "Turn";
         
+        var currentPlayerAddressElement = document.getElementById("address");
+        if (currentPlayerTurn == "X"){
+            currentPlayerAddressElement.value = xPlayerAddress;
+        } else {
+            currentPlayerAddressElement.value = oPlayerAddress;
+        }
     }
     
     
