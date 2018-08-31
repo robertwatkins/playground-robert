@@ -1,0 +1,19 @@
+<html>
+
+    <script>
+        var msg = "set at beginning of script";
+        
+        window.addEventListener('load', function() {
+            console.log("(now inside event listener function before setmsg)");
+            setMsg("set in window 'load' function");
+            console.log("(now inside event listener function after setmsg)");
+            logMsg();
+        })
+        function setMsg(newMsg){
+            msg = newMsg;
+        }
+        function logMsg(){
+            console.log(msg);   
+        }
+    </script>
+</html>

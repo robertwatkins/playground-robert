@@ -103,11 +103,12 @@ contract tictactoe {
         } else {
             playerMakingMove = getPlayerMark(msg.sender);
         }
-        nextPlayerMark = playerAfter(playerMakingMove);
         //create an empty game and add the players move in location, 
         //then use bitwise 'or' to modifiy the gamestate
-        bytes9 moveMask = playerMakingMove >> (moveLocation * 8);
+        bytes9 moveMask = playerMakingMove;
+        moveMask = moveMask >> (moveLocation * 8);
         gameState = gameState | moveMask;
+        nextPlayerMark = playerAfter(playerMakingMove);
     }
 
     /// @author Robert Watkins

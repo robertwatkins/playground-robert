@@ -31,7 +31,9 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
           <h3>You (O)</h3>
         </div>
         <div class="w3-clear"></div>
-        <h4>[Your Name]</h4><input id="o-player-address" value="0x2C26D29abA30e555eD4f25A3F3F800c0Cdc15776"><input type="button" value="Start">
+        <h4>[Your Name]</h4><input id="o-player-address" value="0x2C26D29abA30e555eD4f25A3F3F800c0Cdc15776">
+        <input type="button" value="Start">  
+        <div id="balance"></div>
       </div>
     </div>
     <div class="w3-half">
@@ -43,7 +45,6 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
         <div class="w3-clear"></div>
           <h4>[Opponent Name]</h4><input id="x-player-address" value="0x31b6Fd2AC4Bf067BC5B0EB3B1b7c92f7b9acCB97"/>
           <input type="button" value="Join">
-          <div id="balance"></div>
       </div>
     </div>
   </div>
@@ -70,14 +71,124 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
 
 <script>
     //By convention the smart contract will use '0x00' for a space not played, '0x11' for 'X' and '0xAA' for 'O', 'CAT' (0xFF).
+    //contract variables
+    var web3;
+    var web3js;
+    var balance;
+    var xPlayerAddress;
+    var oPlayerAddress;
+    var gameAddress;
+    var abiArray = [
+	{
+		"constant": false,
+		"inputs": [],
+		"name": "joinGame",
+		"outputs": [],
+		"payable": true,
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [],
+		"name": "kill",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "moveLocation",
+				"type": "uint256"
+			}
+		],
+		"name": "makeMove",
+		"outputs": [],
+		"payable": true,
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"payable": true,
+		"stateMutability": "payable",
+		"type": "constructor"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "getGameState",
+		"outputs": [
+			{
+				"name": "",
+				"type": "bytes9"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "getMyMark",
+		"outputs": [
+			{
+				"name": "",
+				"type": "bytes1"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "listPlayers",
+		"outputs": [
+			{
+				"name": "",
+				"type": "address[2]"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "showWinner",
+		"outputs": [
+			{
+				"name": "",
+				"type": "bytes1"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	}
+]
+    var ticTacToeContract = web3.eth.contract(abiArray);
+    var ticTacToeContractInstance;
+
+    //game info
     var currentPlayerTurn = "X";
     var currentMoves = ["","","","","","","","",""];
+    
+    //display info
     var scale = 300;
     var width = scale / 20;
     var boardColor = 'black';
     var xColor = '#009688';
     var oColor = '#2196F3';
     var fillColor = 'white';
+    balanceElement =  document.getElementById("balance");
     var c = document.getElementById("tictactoeboard");
     var ctx = c.getContext("2d");
     c.addEventListener('mousemove', function(evt) {
@@ -90,34 +201,95 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
     }, false);
     createBoard();
     drawCurrentMoves();
+
+
+
+
+   //=======================================================
+   //contract info  
+   //=======================================================
+
+function initializeGame(){    
+    xPlayerAddress = "0x2c26d29aba30e555ed4f25a3f3f800c0cdc15776";
+    oPlayerAddress = "0x31b6fd2ac4bf067bc5b0eb3b1b7c92f7b9accb97";
+    gameAddress = "0xf47c6db95886a3bda73b2d0d9e62578d99ce12d5";
+
+    ticTacToeContractInstance = ticTacToeContract.at(gameAddress);
+    web3.eth.defaultAccount = oPlayerAddress;
+    web3.personal.unlockAccount(web3.eth.defaultAccount,playGame);
+}
+
+function playGame(){
+    web3js.eth.getBalance(xPlayerAddress, updateBalance);
+    ticTacToeContractInstance.listPlayers(logPlayers);
+    ticTacToeContractInstance.getGameState(logGameState);
+    ticTacToeContractInstance.getMyMark(logMyMark);
+    //ticTacToeContractInstance.makeMove("moveLocation",8, {value: 1, gas: 200000}, logMyMove);
+    ticTacToeContractInstance.makeMove(0x5, {value: 1, gas: 200000}, logMyMove);
+    //ticTacToeContractInstance.joinGame({value: 1, gas: 200000}, logJoinGame);
     
+}
     
-    //todo find example for connecting to network, calling contract with parameters
-    //todo find a polling mechanism to keep status updated
-    //http://hypernephelist.com/2016/06/21/a-simple-smart-contract-ui-web3.html
+function logJoinGame (error, msg){
+    if(!error){
+        console.log(msg);
+    }
+    else{
+        console.error(error);
+    } 
+} 
+   
     
-    //var web3 = new Web3(new Web3.providers.HttpProvider("http://127.0.0.1:7545"));
+function logMyMove (error, move){
+    if(!error){
+        console.log("moved " + move);
+        ticTacToeContractInstance.getGameState(logGameState);
+    }
+    else{
+        console.error(error);
+    } 
+} 
+    
+ 
+function logMyMark (error, mark){
+    if(!error){
+        console.log("Current Player's Mark" + mark);
+        ticTacToeContractInstance.getGameState(logGameState);
+    }
+    else{
+        console.error(error);
+    } 
+} 
+    
+function logGameState (error, gameState){
+    if(!error){
+        console.log("Game State " + gameState);
+    }
+    else{
+        console.error(error);
+    } 
+}
 
-    //if (typeof web3 === 'undefined') {
-    //  alert('You need to install MetaMask to use this feature.  https://metamask.io')
-    //}
-    //var game_address = "0x9686d33515d8854e3af39346c3c24c6042136ded"
-
-//  web3.eth.sendTransaction({
-//    to: game_address,
-//    from: user_address,
-//    value: web3.toWei('1', 'ether'),
-//  }, function (err, transactionHash) {
-//    if (err) return renderMessage('Oh no!: ' + err.message)
-
-    // If you get a transactionHash, you can assume it was sent,
-    // or if you want to guarantee it was received, you can poll
-    // for that transaction to be mined first.
-//    renderMessage('Thanks!')
-//  }
-
+function logPlayers (error, playerList){
+    if(!error){
+        console.log("Players" + playerList);
+    }
+    else{
+        console.error(error);
+    } 
+}
+    
+function updateBalance(error, balanceWei){
+    if(!error){
+        balance = JSON.stringify(web3js.fromWei(balanceWei, 'ether'));
+        console.log(balance);
+    }
+    else{
+        console.error(error);
+    }
+}
+    
 window.addEventListener('load', function() {
-
     // Checking if Web3 has been injected by the browser (Mist/MetaMask)
     if (typeof web3 !== 'undefined') {
         // Use Mist/MetaMask's provider
@@ -127,35 +299,22 @@ window.addEventListener('load', function() {
         // fallback - use your fallback strategy (local node / hosted node +     in-dapp id mgmt / fail)
         web3js = new Web3(new Web3.providers.HttpProvider("http://localhost:7545"));
     }
-
-    var user_address = web3js.eth.accounts[0];
-    var balanceWei;
-    console.log(user_address);
-    user_address = "0x2C26D29abA30e555eD4f25A3F3F800c0Cdc15776";
-    //use callbacks
-    //https://github.com/ethereum/wiki/wiki/JavaScript-API#using-callbacks
-    //old version-var balanceWei = web3js.eth.getBalance(user_address).toNumber();
-    //new version below
-    web3js.eth.getBalance(user_address, function(error, balanceWei){
-   if(!error)
-       console.log(JSON.stringify(balanceWei));
-   else
-       console.error(error);
-    })
-    
-    var balance = web3js.fromWei(balanceWei, 'ether');
-    balanceElement =  document.getElementById("balance");
-    balanceElement.innerHTML = balance;
-
-
+    initializeGame();
 })
 
-
+   //=======================================================
+   // display 
+   //=======================================================
     function makeMove(x,y){
         var location = getLocationFromMousePosition(x, y);
         if (location >=0 && location <=8 ) {
             if(currentMoves[location]==""){
+                //todo move logic to contract for making move
+                //this puts the logic in the UI
                 currentMoves[location]=currentPlayerTurn;
+                
+                //todo move logic to verify move and ending turn to contract
+                //be sure to update UI
                 endCurrentPlayersTurn();
                 createBoard();
                 drawCurrentMoves();
@@ -227,7 +386,7 @@ window.addEventListener('load', function() {
                 location = 8;
             }
         }
-        console.log(location);
+        //console.log(location);
         return location;
     }
     function drawCurrentMoves(){

@@ -111,9 +111,9 @@
 
 
 function initializeGame(){    
-    xPlayerAddress = "0x2C26D29abA30e555eD4f25A3F3F800c0Cdc15776";
-    oPlayerAddress = "0x31b6Fd2AC4Bf067BC5B0EB3B1b7c92f7b9acCB97";
-    gameAddress = "0xcaad14b7d410ebbf77f1b63c5ce869a017e80ae3";
+    xPlayerAddress = "0x2c26d29aba30e555ed4f25a3f3f800c0cdc15776";
+    oPlayerAddress = "0x31b6fd2ac4bf067bc5b0eb3b1b7c92f7b9accb97";
+    gameAddress = "0xf47c6db95886a3bda73b2d0d9e62578d99ce12d5";
 
     ticTacToeContractInstance = ticTacToeContract.at(gameAddress);
     web3.eth.defaultAccount = oPlayerAddress;
@@ -126,7 +126,7 @@ function playGame(){
     ticTacToeContractInstance.getGameState(logGameState);
     ticTacToeContractInstance.getMyMark(logMyMark);
     //ticTacToeContractInstance.makeMove("moveLocation",8, {value: 1, gas: 200000}, logMyMove);
-    ticTacToeContractInstance.makeMove(0x8, {value: 1, gas: 200000}, logMyMove);
+    ticTacToeContractInstance.makeMove(0x5, {value: 1, gas: 200000}, logMyMove);
     //ticTacToeContractInstance.joinGame({value: 1, gas: 200000}, logJoinGame);
     
 }
@@ -144,6 +144,7 @@ function logJoinGame (error, msg){
 function logMyMove (error, move){
     if(!error){
         console.log("moved " + move);
+        ticTacToeContractInstance.getGameState(logGameState);
     }
     else{
         console.error(error);
