@@ -215,18 +215,16 @@ function initializeGame(){
     gameAddress = "0xf47c6db95886a3bda73b2d0d9e62578d99ce12d5";
 
     ticTacToeContractInstance = ticTacToeContract.at(gameAddress);
-    web3.eth.defaultAccount = oPlayerAddress;
+    web3.eth.defaultAccount = xPlayerAddress;
     web3.personal.unlockAccount(web3.eth.defaultAccount,playGame);
 }
 
 function playGame(){
     web3js.eth.getBalance(xPlayerAddress, updateBalance);
     ticTacToeContractInstance.listPlayers(logPlayers);
-    ticTacToeContractInstance.getGameState(logGameState);
-    ticTacToeContractInstance.getMyMark(logMyMark);
-    //ticTacToeContractInstance.makeMove("moveLocation",8, {value: 1, gas: 200000}, logMyMove);
-    ticTacToeContractInstance.makeMove(0x5, {value: 1, gas: 200000}, logMyMove);
-    //ticTacToeContractInstance.joinGame({value: 1, gas: 200000}, logJoinGame);
+    ticTacToeContractInstance.getGameState(updateGameState);
+    //ticTacToeContractInstance.getMyMark(logMyMark);
+    //ticTacToeContractInstance.makeMove(0x0, {value: 1, gas: 200000}, logMyMove);
     
 }
     
@@ -243,7 +241,7 @@ function logJoinGame (error, msg){
 function logMyMove (error, move){
     if(!error){
         console.log("moved " + move);
-        ticTacToeContractInstance.getGameState(logGameState);
+        //ticTacToeContractInstance.getGameState(updateGameState);
     }
     else{
         console.error(error);
@@ -254,17 +252,32 @@ function logMyMove (error, move){
 function logMyMark (error, mark){
     if(!error){
         console.log("Current Player's Mark" + mark);
-        ticTacToeContractInstance.getGameState(logGameState);
+        //ticTacToeContractInstance.getGameState(updateGameState);
     }
     else{
         console.error(error);
     } 
 } 
     
-function logGameState (error, gameState){
+function updateGameState (error, gameState){
     if(!error){
         console.log("Game State " + gameState);
-    }
+        for (i = 0; i<9; i++){
+            gameStateAsArray = toByteArray(gameState.valueOf());
+            markAtI = gameStateAsArray[i+1];
+            console.log("Mark at position " + i + ": " + markAtI);
+            if (markAtI == 0x11){
+                currentMoves[i] = "X";
+            } else if (markAtI == 0xaa) {
+                currentMoves[i]= "O";
+            } else {
+                currentMoves[i]="";
+            }
+        }
+        drawCurrentMoves();
+        setTimeout(updateGameState, 1000);
+        ticTacToeContractInstance.getGameState(updateGameState);
+}
     else{
         console.error(error);
     } 
@@ -302,6 +315,19 @@ window.addEventListener('load', function() {
     initializeGame();
 })
 
+function toHexString(byteArray) {
+  return Array.prototype.map.call(byteArray, function(byte) {
+    return ('0' + (byte & 0xFF).toString(16)).slice(-2);
+  }).join('');
+}
+function toByteArray(hexString) {
+  var result = [];
+  while (hexString.length >= 2) {
+    result.push(parseInt(hexString.substring(0, 2), 16));
+    hexString = hexString.substring(2, hexString.length);
+  }
+  return result;
+}
    //=======================================================
    // display 
    //=======================================================
@@ -312,7 +338,7 @@ window.addEventListener('load', function() {
                 //todo move logic to contract for making move
                 //this puts the logic in the UI
                 currentMoves[location]=currentPlayerTurn;
-                
+                ticTacToeContractInstance.makeMove(location, {value: 1, gas: 200000}, logMyMove);
                 //todo move logic to verify move and ending turn to contract
                 //be sure to update UI
                 endCurrentPlayersTurn();
