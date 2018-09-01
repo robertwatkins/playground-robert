@@ -60,7 +60,7 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
               <h3 id="currentPlayerIndicator">Waiting</h3>
             </div>
             <div class="w3-clear"></div>
-            <h4 id="currentPlayerIndicatorAddendum">to start game</h4><input id="address" value="">
+            <h4 id="currentPlayerIndicatorAddendum">to start game</h4><input type=hidden id="address" value="">
           </div>
         </div>
       </div>
@@ -180,6 +180,8 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
     //game info
     var currentPlayerTurn = "X";
     var currentMoves = ["","","","","","","","",""];
+    var gameWinner = "";
+    var playerCount = 0;
     
     //display info
     var scale = 300;
@@ -210,22 +212,17 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
    //=======================================================
 
 function initializeGame(){    
-    xPlayerAddress = "0x2c26d29aba30e555ed4f25a3f3f800c0cdc15776";
-    oPlayerAddress = "0x31b6fd2ac4bf067bc5b0eb3b1b7c92f7b9accb97";
-    gameAddress = "0x4f1cb53e9084558e7f0ae4e51d5ddd703e0180a5";
+    oPlayerAddress = "0x2c26d29aba30e555ed4f25a3f3f800c0cdc15776";
+    xPlayerAddress = "0x31b6fd2ac4bf067bc5b0eb3b1b7c92f7b9accb97";
+    gameAddress = "0xe89d6fd958c20c06496a7ef60a63315d79d353e9";
 
     ticTacToeContractInstance = ticTacToeContract.at(gameAddress);
-    web3.eth.defaultAccount = xPlayerAddress;
-    web3.personal.unlockAccount(web3.eth.defaultAccount,playGame);
+    //web3.eth.defaultAccount = xPlayerAddress;
+    //web3.personal.unlockAccount(web3.eth.defaultAccount,playGame);
 }
 
 function playGame(){
-    web3js.eth.getBalance(oPlayerAddress, updateBalance);
-    ticTacToeContractInstance.listPlayers(logPlayers);
     ticTacToeContractInstance.getGameState(updateGameState);
-    //ticTacToeContractInstance.getMyMark(logMyMark);
-    //ticTacToeContractInstance.makeMove(0x0, {value: 1, gas: 200000}, logMyMove);
-    
 }
     
 function logJoinGame (error, msg){
@@ -259,6 +256,21 @@ function logMyMark (error, mark){
     } 
 } 
     
+function updateWinner (error, winnerFromContract){
+    if (!error){
+        if (winnerFromContract == 0x11) {
+            gameWinner = "X";
+        } else if (winnerFromContract == 0xaa){
+            gameWinner = "O";
+        } else {
+            gameWinner = "";
+        }
+    }
+    else {
+        console.error(error);
+    }
+}
+    
 function updateGameState (error, gameState){
     if(!error && (typeof gameState != 'undefined')){
         //console.log("Game State " + gameState);
@@ -279,6 +291,7 @@ function updateGameState (error, gameState){
         drawCurrentMoves();
         updateTurn();
         setTimeout(updateGameState, 1000);
+        ticTacToeContractInstance.showWinner(updateWinner);
         ticTacToeContractInstance.getGameState(updateGameState);
 }
     else{
@@ -300,10 +313,10 @@ function updateTurn(){
     }
     if (xCount>oCount) {
         currentPlayerTurn = "O";
-        web3.eth.defaultAccount = oPlayerAddress;
+        //web3.eth.defaultAccount = oPlayerAddress;
     } else {
         currentPlayerTurn = "X";
-        web3.eth.defaultAccount = xPlayerAddress;
+        //web3.eth.defaultAccount = xPlayerAddress;
     }
     //console.log("Current Player: "+ currentPlayerTurn + " : xCount=" + xCount + " : oCount=" + oCount );
     updateCurrentPlayerIndicator();
@@ -328,14 +341,29 @@ function updateBalance(error, balanceWei){
     }
 }
     
+function updatePlayerCount(error,playerList) {
+    if(!error){
+        if (playerList[0] == 0) {
+            playerCount = 0;
+        } else if (playerList[1] == 0){
+            playerCount = 1;   
+        } else {
+            playerCount = 2;
+        }
+    }
+    else{
+        console.error(error);
+    }    
+}
+    
 function join(mark){
     if (mark = "X"){
-    web3.eth.defaultAccount = xPlayerAddress;
+    //web3.eth.defaultAccount = xPlayerAddress;
     } else {
-        web3.eth.defaultAccount = oPlayerAddress;
+        //web3.eth.defaultAccount = oPlayerAddress;
     }
 
-    ticTacToeContractInstance.makeMove(0x0, {value: 1, gas: 200000}, logMyMove);
+    ticTacToeContractInstance.joinGame({value: 1, gas: 200000}, logJoinGame);
 }
     
 window.addEventListener('load', function() {
@@ -364,6 +392,8 @@ function toByteArray(hexString) {
   }
   return result;
 }
+    
+
    //=======================================================
    // display 
    //=======================================================
@@ -395,16 +425,32 @@ function toByteArray(hexString) {
     
     function updateCurrentPlayerIndicator(){
         var currentPlayerIndicatorElement = document.getElementById("currentPlayerIndicator");
-        currentPlayerIndicatorElement.innerHTML = "Player " + currentPlayerTurn;
-        
         var currentPlayerIndicatorAddendumElement = document.getElementById("currentPlayerIndicatorAddendum");
-        currentPlayerIndicatorAddendumElement.innerHTML = "Turn";
-        
         var currentPlayerAddressElement = document.getElementById("address");
-        if (currentPlayerTurn == "X"){
-            currentPlayerAddressElement.value = xPlayerAddress;
+        if (playerCount < 2){
+            if (playerCount == 0){
+                currentPlayerIndicatorElement.innerHTML = "0 Players";
+                currentPlayerIndicatorAddendumElement.innerHTML = "Joined";
+            } else {
+                currentPlayerIndicatorElement.innerHTML = "1 Player";
+                currentPlayerIndicatorAddendumElement.innerHTML = "Joined";
+            }
+            if (typeof ticTacToeContractInstance != 'undefined'){
+                ticTacToeContractInstance.listPlayers(updatePlayerCount);
+            }
         } else {
-            currentPlayerAddressElement.value = oPlayerAddress;
+            if (gameWinner == ""){
+                currentPlayerIndicatorElement.innerHTML = "Player " + currentPlayerTurn;
+                currentPlayerIndicatorAddendumElement.innerHTML = "Turn";
+                if (currentPlayerTurn == "X"){
+                    currentPlayerAddressElement.value = xPlayerAddress;
+                } else {
+                    currentPlayerAddressElement.value = oPlayerAddress;
+                }
+            } else {
+                currentPlayerIndicatorElement.innerHTML = "Player " + gameWinner;
+                currentPlayerIndicatorAddendumElement.innerHTML = "Winner!";
+            }
         }
     }
     
