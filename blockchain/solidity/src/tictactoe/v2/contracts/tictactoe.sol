@@ -21,6 +21,10 @@ contract tictactoe {
         
     constructor() payable public{
         owner = msg.sender;
+        resetGame();
+    }
+    
+    function resetGame() private {
         xPlayerAddress = noAddress;
         oPlayerAddress = noAddress;
         gameState = gameWithNoMoves;
@@ -62,6 +66,15 @@ contract tictactoe {
     function kill() public {
         if (msg.sender == owner) selfdestruct(owner);
     }
+    
+    
+    function rageQuit() public {
+        if (msg.sender == owner
+            || msg.sender == xPlayerAddress
+            || msg.sender == oPlayerAddress) {
+                resetGame();
+            }
+    }    
     
     /// @author Robert Watkins
     /// @notice Return a message indicating if the game state is valid
@@ -151,8 +164,11 @@ contract tictactoe {
     /// @author Robert Watkins
     /// @notice returns a boolean 'False' if there is no game in progress and 'True' if there is a game in progress
     function gameInProgress() view private returns (bool) {
-        bool isGameInProgress = (gameState != gameWithNoMoves ) 
-                             || ((gameState == gameWithNoMoves) && (xPlayerAddress != noAddress) && (oPlayerAddress != noAddress));
+        bytes1 winner = showWinner();
+        bool isGameInProgress = ((gameState != gameWithNoMoves ) 
+                             || ((gameState == gameWithNoMoves) && (xPlayerAddress != noAddress) && (oPlayerAddress != noAddress))
+                             || (winner == xPlayerMark)
+                             || (winner == oPlayerMark));
         return isGameInProgress;
     }
     

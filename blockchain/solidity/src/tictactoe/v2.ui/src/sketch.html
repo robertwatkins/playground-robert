@@ -31,8 +31,8 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
           <h3>You (O)</h3>
         </div>
         <div class="w3-clear"></div>
-        <h4>[Your Name]</h4><input type=hidden id="o-player-address" value="0x2C26D29abA30e555eD4f25A3F3F800c0Cdc15776">
-        <input type="button" value="Join" onclick=join("O")>  
+        <input type=hidden id="o-player-address" value="0x2C26D29abA30e555eD4f25A3F3F800c0Cdc15776">
+        <input id="oPlayerJoinButton" class="w3-button w3-border" type="button" value="Join" onclick=join("O")>  
         <div id="balance"></div>
       </div>
     </div>
@@ -43,8 +43,8 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
           <h3>Opponent (X)</h3>
         </div>
         <div class="w3-clear"></div>
-          <h4>[Opponent Name]</h4><input type=hidden id="x-player-address" value="0x31b6Fd2AC4Bf067BC5B0EB3B1b7c92f7b9acCB97"/>
-          <input type="button" value="Join" onclick=join("X")>
+          <input type=hidden id="x-player-address" value="0x31b6Fd2AC4Bf067BC5B0EB3B1b7c92f7b9acCB97"/>
+          <input id="xPlayerJoinButton" class="w3-button w3-border" type="button" value="Join" onclick=join("X")>
       </div>
     </div>
   </div>
@@ -68,15 +68,22 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
   <hr>
   <!-- End page content -->
 </div>
-
+<div id="errorDialog" class="w3-card-4 w3-half w3-pale-red w3-display-middle" style="display: none">
+    <div class="w3-container w3-xlarge w3-black w3-padding-16">
+        Error
+      <span onclick="document.getElementById('errorDialog').style.display='none'" 
+      class="w3-button w3-display-topright w3-large">&times;</span>
+    </div>
+    <div id="errorDialogMessage" class=" w3-padding-32"></div>
+</div>
 <script>
     //By convention the smart contract will use '0x00' for a space not played, '0x11' for 'X' and '0xAA' for 'O', 'CAT' (0xFF).
     //contract variables
     var web3;
     var web3js;
     var balance;
-    var xPlayerAddress;
-    var oPlayerAddress;
+    //var xPlayerAddress;
+    //var oPlayerAddress;
     var gameAddress;
     var abiArray = [
 	{
@@ -212,17 +219,14 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
    //=======================================================
 
 function initializeGame(){    
-    oPlayerAddress = "0x2c26d29aba30e555ed4f25a3f3f800c0cdc15776";
-    xPlayerAddress = "0x31b6fd2ac4bf067bc5b0eb3b1b7c92f7b9accb97";
-    gameAddress = "0xe89d6fd958c20c06496a7ef60a63315d79d353e9";
+    //oPlayerAddress = "0x2c26d29aba30e555ed4f25a3f3f800c0cdc15776";
+    //xPlayerAddress = "0x31b6fd2ac4bf067bc5b0eb3b1b7c92f7b9accb97";
+    gameAddress = "0xa6c34ca191255431898a72cbf146eb69c24dcca1";
 
     ticTacToeContractInstance = ticTacToeContract.at(gameAddress);
-    //web3.eth.defaultAccount = xPlayerAddress;
-    //web3.personal.unlockAccount(web3.eth.defaultAccount,playGame);
-}
-
-function playGame(){
     ticTacToeContractInstance.getGameState(updateGameState);
+    ticTacToeContractInstance.listPlayers(updatePlayerCount);
+    ticTacToeContractInstance.showWinner(updateWinner);
 }
     
 function logJoinGame (error, msg){
@@ -231,6 +235,7 @@ function logJoinGame (error, msg){
     }
     else{
         console.error(error);
+        displayError(error);
     } 
 } 
    
@@ -238,10 +243,12 @@ function logJoinGame (error, msg){
 function logMyMove (error, move){
     if(!error){
         console.log("moved " + move);
-        //ticTacToeContractInstance.getGameState(updateGameState);
+        ticTacToeContractInstance.getGameState(updateGameState);
+        ticTacToeContractInstance.showWinner(updateWinner);
     }
     else{
         console.error(error);
+        displayError(error);
     } 
 } 
     
@@ -249,10 +256,11 @@ function logMyMove (error, move){
 function logMyMark (error, mark){
     if(!error){
         console.log("Current Player's Mark" + mark);
-        //ticTacToeContractInstance.getGameState(updateGameState);
+        ticTacToeContractInstance.getGameState(updateGameState);
     }
     else{
         console.error(error);
+        displayError(error);
     } 
 } 
     
@@ -265,9 +273,11 @@ function updateWinner (error, winnerFromContract){
         } else {
             gameWinner = "";
         }
+        updateCurrentPlayerIndicator();
     }
     else {
         console.error(error);
+        displayError(error);
     }
 }
     
@@ -275,7 +285,6 @@ function updateGameState (error, gameState){
     if(!error && (typeof gameState != 'undefined')){
         //console.log("Game State " + gameState);
         for (i = 0; i<9; i++){
-            //gameStateAsArray = toByteArray(gameState.valueOf());
             gameStateAsArray = toByteArray(gameState);
             markAtI = gameStateAsArray[i+1];
             //console.log("Mark at position " + i + ": " + markAtI);
@@ -292,11 +301,13 @@ function updateGameState (error, gameState){
         updateTurn();
         setTimeout(updateGameState, 1000);
         ticTacToeContractInstance.showWinner(updateWinner);
+        updateCurrentPlayerIndicator();
         ticTacToeContractInstance.getGameState(updateGameState);
 }
     else{
         if (typeof error != 'undefined'){
             console.error(error);
+            displayError(error);
         }
     } 
 }
@@ -313,10 +324,8 @@ function updateTurn(){
     }
     if (xCount>oCount) {
         currentPlayerTurn = "O";
-        //web3.eth.defaultAccount = oPlayerAddress;
     } else {
         currentPlayerTurn = "X";
-        //web3.eth.defaultAccount = xPlayerAddress;
     }
     //console.log("Current Player: "+ currentPlayerTurn + " : xCount=" + xCount + " : oCount=" + oCount );
     updateCurrentPlayerIndicator();
@@ -328,6 +337,7 @@ function logPlayers (error, playerList){
     }
     else{
         console.error(error);
+        displayError(error);
     } 
 }
     
@@ -338,11 +348,13 @@ function updateBalance(error, balanceWei){
     }
     else{
         console.error(error);
+        displayError(error);
     }
 }
     
 function updatePlayerCount(error,playerList) {
     if(!error){
+        //console.log(playerList);
         if (playerList[0] == 0) {
             playerCount = 0;
         } else if (playerList[1] == 0){
@@ -350,19 +362,15 @@ function updatePlayerCount(error,playerList) {
         } else {
             playerCount = 2;
         }
+        updateCurrentPlayerIndicator();
     }
     else{
         console.error(error);
+        displayError(error);
     }    
 }
     
 function join(mark){
-    if (mark = "X"){
-    //web3.eth.defaultAccount = xPlayerAddress;
-    } else {
-        //web3.eth.defaultAccount = oPlayerAddress;
-    }
-
     ticTacToeContractInstance.joinGame({value: 1, gas: 200000}, logJoinGame);
 }
     
@@ -401,13 +409,8 @@ function toByteArray(hexString) {
         var location = getLocationFromMousePosition(x, y);
         if (location >=0 && location <=8 ) {
             if(currentMoves[location]==""){
-                //todo move logic to contract for making move
-                //this puts the logic in the UI
-                currentMoves[location]=currentPlayerTurn;
+                //currentMoves[location]=currentPlayerTurn;
                 ticTacToeContractInstance.makeMove(location, {value: 1, gas: 200000}, logMyMove);
-                //todo move logic to verify move and ending turn to contract
-                //be sure to update UI
-                //endCurrentPlayersTurn();
                 createBoard();
                 drawCurrentMoves();
             }
@@ -426,7 +429,10 @@ function toByteArray(hexString) {
     function updateCurrentPlayerIndicator(){
         var currentPlayerIndicatorElement = document.getElementById("currentPlayerIndicator");
         var currentPlayerIndicatorAddendumElement = document.getElementById("currentPlayerIndicatorAddendum");
-        var currentPlayerAddressElement = document.getElementById("address");
+        //var currentPlayerAddressElement = document.getElementById("address");
+        var xJoinButton = document.getElementById("xPlayerJoinButton");
+        var oJoinButton = document.getElementById("oPlayerJoinButton");
+        //console.log("Player Count: " + playerCount);
         if (playerCount < 2){
             if (playerCount == 0){
                 currentPlayerIndicatorElement.innerHTML = "0 Players";
@@ -440,14 +446,18 @@ function toByteArray(hexString) {
             }
         } else {
             if (gameWinner == ""){
+                xJoinButton.style.display = "none";
+                oJoinButton.style.display = "none";
                 currentPlayerIndicatorElement.innerHTML = "Player " + currentPlayerTurn;
                 currentPlayerIndicatorAddendumElement.innerHTML = "Turn";
-                if (currentPlayerTurn == "X"){
-                    currentPlayerAddressElement.value = xPlayerAddress;
-                } else {
-                    currentPlayerAddressElement.value = oPlayerAddress;
-                }
+                //if (currentPlayerTurn == "X"){
+                //    currentPlayerAddressElement.value = xPlayerAddress;
+                //} else {
+                //    currentPlayerAddressElement.value = oPlayerAddress;
+                //}
             } else {
+                xJoinButton.style.display = "initial";;
+                oJoinButton.style.display = "initial";;
                 currentPlayerIndicatorElement.innerHTML = "Player " + gameWinner;
                 currentPlayerIndicatorAddendumElement.innerHTML = "Winner!";
             }
@@ -467,7 +477,6 @@ function toByteArray(hexString) {
         if (location >=0 && location <=8 ) {
             if(currentMoves[location]==""){
                 makeMarkAtLocation(currentPlayerTurn,location);
-                //todo remove this and get move from other player makeMarkAtLocation("X",location);
             }
         }
     }
@@ -584,6 +593,11 @@ function toByteArray(hexString) {
           y: evt.clientY - rect.top
         };
     }    
+    
+    function displayError(msg){
+        document.getElementById('errorDialogMessage').innerHTML=msg;
+        document.getElementById('errorDialog').style.display='block';
+    }
 </script>
 
 </body>
