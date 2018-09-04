@@ -163,12 +163,17 @@ contract tictactoe {
     
     /// @author Robert Watkins
     /// @notice returns a boolean 'False' if there is no game in progress and 'True' if there is a game in progress
-    function gameInProgress() view private returns (bool) {
+    function gameInProgress() private returns (bool) {
         bytes1 winner = showWinner();
-        bool isGameInProgress = ((gameState != gameWithNoMoves ) 
-                             || ((gameState == gameWithNoMoves) && (xPlayerAddress != noAddress) && (oPlayerAddress != noAddress))
-                             || (winner == xPlayerMark)
-                             || (winner == oPlayerMark));
+        bool isGameInProgress = (
+                                    (gameState != gameWithNoMoves ) 
+                                    || ((gameState == gameWithNoMoves) && (xPlayerAddress != noAddress) && (oPlayerAddress != noAddress))
+                                )
+                            && (winner != xPlayerMark)
+                            && (winner != oPlayerMark);
+        if ((winner == oPlayerMark) || (winner == xPlayerMark)){
+            resetGame();
+        }
         return isGameInProgress;
     }
     
