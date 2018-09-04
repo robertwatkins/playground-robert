@@ -221,7 +221,7 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
 function initializeGame(){    
     //oPlayerAddress = "0x2c26d29aba30e555ed4f25a3f3f800c0cdc15776";
     //xPlayerAddress = "0x31b6fd2ac4bf067bc5b0eb3b1b7c92f7b9accb97";
-    gameAddress = "0xa6c34ca191255431898a72cbf146eb69c24dcca1";
+    gameAddress = "0x00c5d72b65246d5083ff84214fb98c0e8a355ad9";
 
     ticTacToeContractInstance = ticTacToeContract.at(gameAddress);
     ticTacToeContractInstance.getGameState(updateGameState);
@@ -231,7 +231,9 @@ function initializeGame(){
     
 function logJoinGame (error, msg){
     if(!error){
-        console.log(msg);
+        //console.log(msg);
+        ticTacToeContractInstance.getGameState(updateGameState);
+        ticTacToeContractInstance.showWinner(updateWinner);
     }
     else{
         console.error(error);
@@ -242,9 +244,8 @@ function logJoinGame (error, msg){
     
 function logMyMove (error, move){
     if(!error){
-        console.log("moved " + move);
+        //console.log("moved " + move);
         ticTacToeContractInstance.getGameState(updateGameState);
-        ticTacToeContractInstance.showWinner(updateWinner);
     }
     else{
         console.error(error);
@@ -255,7 +256,7 @@ function logMyMove (error, move){
  
 function logMyMark (error, mark){
     if(!error){
-        console.log("Current Player's Mark" + mark);
+        //console.log("Current Player's Mark" + mark);
         ticTacToeContractInstance.getGameState(updateGameState);
     }
     else{
@@ -297,11 +298,12 @@ function updateGameState (error, gameState){
             }
         }
         //console.log("Current Moves : " + currentMoves);
+        createBoard();
         drawCurrentMoves();
         updateTurn();
-        setTimeout(updateGameState, 1000);
-        ticTacToeContractInstance.showWinner(updateWinner);
         updateCurrentPlayerIndicator();
+        //setTimeout(updateGameState, 1000);
+        ticTacToeContractInstance.showWinner(updateWinner);
         ticTacToeContractInstance.getGameState(updateGameState);
 }
     else{
