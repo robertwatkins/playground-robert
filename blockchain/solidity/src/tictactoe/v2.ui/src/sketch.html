@@ -82,8 +82,6 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
     var web3;
     var web3js;
     var balance;
-    //var xPlayerAddress;
-    //var oPlayerAddress;
     var gameAddress;
     var abiArray = [
 	{
@@ -219,8 +217,6 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
    //=======================================================
 
 function initializeGame(){    
-    //oPlayerAddress = "0x2c26d29aba30e555ed4f25a3f3f800c0cdc15776";
-    //xPlayerAddress = "0x31b6fd2ac4bf067bc5b0eb3b1b7c92f7b9accb97";
     gameAddress = "0x00c5d72b65246d5083ff84214fb98c0e8a355ad9";
 
     ticTacToeContractInstance = ticTacToeContract.at(gameAddress);
@@ -231,11 +227,9 @@ function initializeGame(){
     
 function logJoinGame (error, msg){
     if(!error){
-        //console.log(msg);
         if (playerCount == 2){
             ticTacToeContractInstance.reset(updateGameState);
         }
-        //ticTacToeContractInstance.getGameState(updateGameState);
     }
     else{
         console.error(error);
@@ -246,7 +240,6 @@ function logJoinGame (error, msg){
     
 function logMyMove (error, move){
     if(!error){
-        //console.log("moved " + move);
         ticTacToeContractInstance.getGameState(updateGameState);
     }
     else{
@@ -258,7 +251,6 @@ function logMyMove (error, move){
  
 function logMyMark (error, mark){
     if(!error){
-        //console.log("Current Player's Mark" + mark);
         ticTacToeContractInstance.getGameState(updateGameState);
     }
     else{
@@ -288,11 +280,9 @@ function updateWinner (error, winnerFromContract){
     
 function updateGameState (error, gameState){
     if(!error && (typeof gameState != 'undefined')){
-        //console.log("Game State " + gameState);
         for (i = 0; i<9; i++){
             gameStateAsArray = toByteArray(gameState);
             markAtI = gameStateAsArray[i+1];
-            //console.log("Mark at position " + i + ": " + markAtI);
             if (markAtI == 0x11){
                 currentMoves[i] = "X";
             } else if (markAtI == 0xaa) {
@@ -301,12 +291,10 @@ function updateGameState (error, gameState){
                 currentMoves[i]="";
             }
         }
-        //console.log("Current Moves : " + currentMoves);
         createBoard();
         drawCurrentMoves();
         updateTurn();
         updateCurrentPlayerIndicator();
-        //setTimeout(updateGameState, 1000);
         ticTacToeContractInstance.showWinner(updateWinner);
         ticTacToeContractInstance.getGameState(updateGameState);
 }
@@ -333,7 +321,6 @@ function updateTurn(){
     } else {
         currentPlayerTurn = "X";
     }
-    //console.log("Current Player: "+ currentPlayerTurn + " : xCount=" + xCount + " : oCount=" + oCount );
     updateCurrentPlayerIndicator();
 }
 
@@ -360,7 +347,6 @@ function updateBalance(error, balanceWei){
     
 function updatePlayerCount(error,playerList) {
     if(!error){
-        //console.log(playerList);
         if (playerList[0] == 0) {
             playerCount = 0;
         } else if (playerList[1] == 0){
@@ -415,7 +401,6 @@ function toByteArray(hexString) {
         var location = getLocationFromMousePosition(x, y);
         if (location >=0 && location <=8 ) {
             if(currentMoves[location]==""){
-                //currentMoves[location]=currentPlayerTurn;
                 ticTacToeContractInstance.makeMove(location, {value: 1, gas: 200000}, logMyMove);
                 createBoard();
                 drawCurrentMoves();
@@ -435,10 +420,8 @@ function toByteArray(hexString) {
     function updateCurrentPlayerIndicator(){
         var currentPlayerIndicatorElement = document.getElementById("currentPlayerIndicator");
         var currentPlayerIndicatorAddendumElement = document.getElementById("currentPlayerIndicatorAddendum");
-        //var currentPlayerAddressElement = document.getElementById("address");
         var xJoinButton = document.getElementById("xPlayerJoinButton");
         var oJoinButton = document.getElementById("oPlayerJoinButton");
-        //console.log("Player Count: " + playerCount);
         if ((playerCount < 2) && (gameWinner != "X") && (gameWinner != "O")){
             if (playerCount == 0){
                 currentPlayerIndicatorElement.innerHTML = "0 Players";
@@ -456,11 +439,6 @@ function toByteArray(hexString) {
                 oJoinButton.style.display = "none";
                 currentPlayerIndicatorElement.innerHTML = "Player " + currentPlayerTurn;
                 currentPlayerIndicatorAddendumElement.innerHTML = "Turn";
-                //if (currentPlayerTurn == "X"){
-                //    currentPlayerAddressElement.value = xPlayerAddress;
-                //} else {
-                //    currentPlayerAddressElement.value = oPlayerAddress;
-                //}
             } else {
                 xJoinButton.style.display = "initial";
                 oJoinButton.style.display = "initial";
@@ -515,7 +493,6 @@ function toByteArray(hexString) {
                 location = 8;
             }
         }
-        //console.log(location);
         return location;
     }
     function drawCurrentMoves(){
