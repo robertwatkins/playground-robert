@@ -77,9 +77,12 @@ When 'X' joins the game, the game state and the players are reset, then the new 
  - This will reset the game to an 'unplayed' state to allow for recovery from abandoned games.
  - require: only the owner of the instance can initiate this function
 
+## Running locally
+*Pre-requisites*
+ - Run private blockchain (like ganache)
+ - Run remix http://remix.ethereum.org/
+ -- deploy 'tictactoe.sol' to web3 provider HTTP://127.0.0.1:7545
+ - Edit tictactoe ui (delivered as 'sketch.html')
+ -- update gameAddress in 'sketch.html' to match deployed address from remix 
+ - Run local webserver (like node http-server) where 'sketch.html' is able to be loaded
 
-## Version 3
-Create a Javascript UI to interact with the game built in version 2 using a browser and the 'metamask' browser extension
-
-## Version 4
-Add to UI the ability to replay all games.
