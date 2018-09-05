@@ -232,8 +232,10 @@ function initializeGame(){
 function logJoinGame (error, msg){
     if(!error){
         //console.log(msg);
-        ticTacToeContractInstance.getGameState(updateGameState);
-        ticTacToeContractInstance.showWinner(updateWinner);
+        if (playerCount == 2){
+            ticTacToeContractInstance.reset(updateGameState);
+        }
+        //ticTacToeContractInstance.getGameState(updateGameState);
     }
     else{
         console.error(error);
@@ -269,8 +271,10 @@ function updateWinner (error, winnerFromContract){
     if (!error){
         if (winnerFromContract == 0x11) {
             gameWinner = "X";
+            playerCount = 0;
         } else if (winnerFromContract == 0xaa){
             gameWinner = "O";
+            playerCount = 0;
         } else {
             gameWinner = "";
         }
@@ -435,7 +439,7 @@ function toByteArray(hexString) {
         var xJoinButton = document.getElementById("xPlayerJoinButton");
         var oJoinButton = document.getElementById("oPlayerJoinButton");
         //console.log("Player Count: " + playerCount);
-        if (playerCount < 2){
+        if ((playerCount < 2) && (gameWinner != "X") && (gameWinner != "O")){
             if (playerCount == 0){
                 currentPlayerIndicatorElement.innerHTML = "0 Players";
                 currentPlayerIndicatorAddendumElement.innerHTML = "Joined";
@@ -458,8 +462,8 @@ function toByteArray(hexString) {
                 //    currentPlayerAddressElement.value = oPlayerAddress;
                 //}
             } else {
-                xJoinButton.style.display = "initial";;
-                oJoinButton.style.display = "initial";;
+                xJoinButton.style.display = "initial";
+                oJoinButton.style.display = "initial";
                 currentPlayerIndicatorElement.innerHTML = "Player " + gameWinner;
                 currentPlayerIndicatorAddendumElement.innerHTML = "Winner!";
             }
@@ -543,8 +547,8 @@ function toByteArray(hexString) {
         ctx.lineWidth = width;
 
         if (mark == "X"){
-            ctx.beginPath();
             ctx.strokeStyle = xColor;
+            ctx.beginPath();
             ctx.moveTo(xOffset + (scale/9),yOffset + (scale/9));
             ctx.lineTo(xOffset - (scale/9),yOffset - (scale/9));
             ctx.stroke();
@@ -554,9 +558,9 @@ function toByteArray(hexString) {
             ctx.lineTo(xOffset - (scale/9),yOffset + (scale/9));
             ctx.stroke();
         } else  if ( mark == "O") {
+            ctx.strokeStyle = oColor;
             ctx.beginPath();
             ctx.arc(xOffset, yOffset, scale/9 , 0, 2 * Math.PI, false);
-            ctx.strokeStyle = oColor;
             ctx.fillStyle = fillColor;
             ctx.fill();
             ctx.stroke();  
