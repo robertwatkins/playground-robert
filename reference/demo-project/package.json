@@ -18,7 +18,7 @@
     "js-yaml": "latest",
     "express": ">=3.11.0",
     "request" : "*",
-    "http-proxy": "0.10.3"
+    "http-proxy": "1.18.1"
   },
   "license": "TBD."
 }
